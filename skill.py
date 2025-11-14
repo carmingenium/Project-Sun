@@ -44,5 +44,5 @@ class Coin:
 #   unbreakable=True
 # )
 # possible additions:
-  # flip coin method
-  # 'type', 'value', 'effect', 'operation', 'duration', 'target' definitions
+  # flip coin function
+  # 'type', 'value', 'effect', 'operation', 'duration', 'target' definitions 'support'
