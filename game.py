@@ -2,16 +2,17 @@ import character
 import skill
 
 def initialize_characters():
+  #region charlist
   # list of all encounters & characters
   characterslist = []
   # party
   party_list = []
-  player = character.Character(
-    name="Blacked out Engineer",
-    speed=(5, 10),
-    skills=[],
-    supportSkills=[]
-  )
+  # player = character.Character(
+  #   name="Blacked out Engineer",
+  #   speed=(5, 10),
+  #   skills=[],
+  #   supportSkills=[]
+  # )
   # head of sec
   # 2 x sec off
   # 2 x assistant
@@ -47,7 +48,7 @@ def initialize_characters():
   # Nukie Engineer (summoner, heals borg)
   # Nukie Chemist (dps, healer, debuff)
   # Nukie Borg  (tank dps)
-  
+  #endregion
   
   
   

@@ -1,7 +1,8 @@
 import skill
 class Character:
-  def __init__(self, name, speed, hp, skills=[], supportSkills=[]):
+  def __init__(self, name, sprite, speed, hp, skills=[], supportSkills=[]):
     self.name = name
+    self.sprite = sprite
     self.speed = speed
     self.hp = hp
     self.skills = skills
