@@ -15,6 +15,7 @@ unknown_sprite = pygame.image.load('sprites/unknown.png').convert() # 32x32
 sprites = []
 characterList = []
 def spriteListInitialize(characters):
+  global characterList, sprites
   for char in characters:
     try:
       sprites.append(pygame.image.load(char.sprite).convert())
@@ -88,13 +89,13 @@ def renderNovelScene(character, dialogue_line):
   
 def renderCombatScene(playerParty=None, enemyParty=None):
   # testing render
-  screen.blit(dragon_sprite, (100, dragoncenter_y - 128)) 
-  screen.blit(dragon_sprite, (300, dragoncenter_y - 128))  # upper middle
-  screen.blit(dragon_sprite, (500, dragoncenter_y - 128))
+  # screen.blit(dragon_sprite, (100, dragoncenter_y - 128)) 
+  # screen.blit(dragon_sprite, (300, dragoncenter_y - 128))  # upper middle
+  # screen.blit(dragon_sprite, (500, dragoncenter_y - 128))
   
-  screen.blit(dragon_sprite, (100, dragoncenter_y + 128)) 
-  screen.blit(dragon_sprite, (300, dragoncenter_y + 128))  # upper middle
-  screen.blit(dragon_sprite, (500, dragoncenter_y + 128))
+  # screen.blit(dragon_sprite, (100, dragoncenter_y + 128)) 
+  # screen.blit(dragon_sprite, (300, dragoncenter_y + 128))  # upper middle
+  # screen.blit(dragon_sprite, (500, dragoncenter_y + 128))
   
   for char in playerParty or []:
     sprite = findCharacterSprite(char)

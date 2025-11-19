@@ -12,8 +12,10 @@ print("Members:", dir(renderer))
 # list of all encounters & characters
 characterslist = []
 spriteslist = []
+
 # party
-party_list = []
+playerParty = []
+encounterParty = []
 #endregion
 
 def initializeGame():
@@ -23,6 +25,10 @@ def initializeGame():
   # font = pygame.font.Font(None, 32)   # None = default font, 32 = size
   # initialize characters
   initializeCharacters()
+  playerParty.append(characterslist[0]) # main character
+  encounterParty.append(characterslist[1]) # unknown
+  
+  
 def initializeCharacters():
   #region charlist
 
@@ -68,6 +74,15 @@ def initializeCharacters():
   # Nukie Chemist (dps, healer, debuff)
   # Nukie Borg  (tank dps)
   #endregion
+  player = character.Character(
+    name="Blacked out Engineer",
+    sprite='sprites/engineer.png',
+    speed=(3, 6),
+    hp=100,
+    skills=[],
+    supportSkills=[]
+  )
+  characterslist.append(player)
   unknown = character.Character(
     name="Unknown",
     sprite='sprites/unknown.png',
@@ -100,7 +115,7 @@ def main():
   initializeGame()
   running = True
   # renderer.renderNovelScene(0, "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
-  renderer.renderCombatScene()
+  renderer.renderCombatScene(playerParty, encounterParty)
   while running:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
