@@ -58,7 +58,8 @@ class Character:
   def __init__(self, name, sprite, speed, hp, skills=[], supportSkills=[]):
     self.name = name
     self.sprite = sprite
-    self.speed = speed
+    self.speedRange = speed
+    self.speed = 0 # calculated at turn start
     self.hp = hp
     self.skills = skills
     self.supportSkills = supportSkills
@@ -69,7 +70,8 @@ class Character:
 
   def calculate_speed(self):
     # speed var is a range, get a random value within that range
-    currentSpeed = random.randint(self.speed[0], self.speed[1])
+    currentSpeed = random.randint(self.speedRange[0], self.speedRange[1])
+    self.speed = currentSpeed
     #debuffs might be applied here in the future
     return currentSpeed
     

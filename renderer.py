@@ -96,21 +96,24 @@ def renderCombatScene(playerParty=None, enemyParty=None):
   # screen.blit(dragon_sprite, (100, dragoncenter_y + 128)) 
   # screen.blit(dragon_sprite, (300, dragoncenter_y + 128))  # upper middle
   # screen.blit(dragon_sprite, (500, dragoncenter_y + 128))
-  playerPartyPositions = [(100, center_y), (200, center_y), (300, center_y), (400, center_y), (500, center_y), (600, center_y)]
-  enemyPartyPositions = [(1600, center_y), (1500, center_y), (1400, center_y), (1300, center_y), (1200, center_y), (1100, center_y)]
+  playerPartyPositions = [(110, center_y), (210, center_y), (310, center_y), (150, center_y + 200), (250, center_y + 200) , (350, center_y + 200)]
+  enemyPartyPositions = [(1600, center_y), (1500, center_y), (1400, center_y), (1650, center_y + 200), (1550, center_y + 200), (1450, center_y + 200)]
   
   # keeping rep for later tests
+  # render as surfaces to show hp, speed etc.
   rep = 0
   for char in playerParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6): 
-      screen.blit(sprite, playerPartyPositions[rep])
+      renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
+      screen.blit(renderSprite, playerPartyPositions[rep])
       rep += 1
   rep = 0
   for char in enemyParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6):
-      screen.blit(sprite, enemyPartyPositions[rep]) 
+      renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
+      screen.blit(renderSprite, enemyPartyPositions[rep]) 
       rep += 1
     
   pygame.display.flip()  # Update the display to show changes
