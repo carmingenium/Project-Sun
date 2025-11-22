@@ -1,4 +1,5 @@
 import pygame
+import character
 # initialization
 pygame.init()
 x = 1920
@@ -97,6 +98,7 @@ def renderCombatScene(playerParty=None, enemyParty=None):
   # testing render
   # any sprite size = 32*3 = 96x96, offset = 96/2 = 48
   # -96 needs to be changed as calculated by sprite size later!
+  # -73 also! (its 96/2 + 25 offset)
   leftPartPositions = [(110, center_y - 73), (210, center_y - 73), (310, center_y - 73), (150, center_y + 73), (250, center_y + 73) , (350, center_y + 73)]
   rightPartyPositions = [(x-110-96, center_y - 73), (x-210-96, center_y - 73), (x-310-96, center_y - 73), (x-150-96, center_y + 73), (x-250-96, center_y + 73), (x-350-96, center_y + 73)]
 
@@ -107,7 +109,16 @@ def renderCombatScene(playerParty=None, enemyParty=None):
     sprite = findCharacterSprite(char)
     for i in range(6): 
       renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-      screen.blit(renderSprite, leftPartPositions[rep])
+      spriteSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA)
+      spriteSurface.blit(renderSprite, (50,25))
+      font = pygame.font.Font(None, 24)
+      # sanity
+      spriteSurface.blit(font.render(f"{char.sanity}", True, (137, 207, 240)), (120, renderSprite.get_height() + 25))
+      #hp
+      spriteSurface.blit(font.render(f"{char.hp}", True, (238, 75, 43)), (80, renderSprite.get_height() + 25))
+      #speed
+      spriteSurface.blit(font.render(f"{char.calculate_speed()}", True, (255, 255, 255)), (60, renderSprite.get_height() + 25))
+      screen.blit(spriteSurface, leftPartPositions[rep])
       rep += 1
   rep = 0
   for char in enemyParty or []:

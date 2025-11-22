@@ -60,6 +60,7 @@ class Character:
     self.sprite = sprite
     self.speedRange = speed
     self.speed = 0 # calculated at turn start
+    self.sanity = 0 # almost always starts as 0
     self.hp = hp
     self.skills = skills
     self.supportSkills = supportSkills
