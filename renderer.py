@@ -1,12 +1,19 @@
 import pygame
 # initialization
 pygame.init()
-screen = pygame.display.set_mode((1920, 1080)) # this has to be static as long as the camera system depends on it
+x = 1920
+y = 1080
+screen = pygame.display.set_mode((x, y)) # this has to be static as long as the camera system depends on it
+center_x = x // 2
+center_y = y // 2
 
 
 
+# sprite loading # later done from game.py
+def initializeRenderer():
+  global dragon_sprite, dragon_sprite_big, unknown_sprite
+  return
 
-# sprite loading
 dragon_sprite = pygame.image.load('sprites/spacedragon.png').convert() # 64x64 so double of a normal human
 dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_width()*2, dragon_sprite.get_height()*2))# 128x128
 unknown_sprite = pygame.image.load('sprites/unknown.png').convert() # 32x32
@@ -26,10 +33,9 @@ def spriteListInitialize(characters):
 
 
 # vars
-dragoncenter_y = 540 - (dragon_sprite.get_height() // 2)
-dragoncenter_x = 960 - (dragon_sprite.get_width() // 2)
-center_x = 960
-center_y = 540
+dragoncenter_y = center_y - (dragon_sprite.get_height() // 2)
+dragoncenter_x = center_x - (dragon_sprite.get_width() // 2)
+
 clock = pygame.time.Clock() # frame rate controller
 
 # for dialogues
@@ -89,16 +95,11 @@ def renderNovelScene(character, dialogue_line):
   
 def renderCombatScene(playerParty=None, enemyParty=None):
   # testing render
-  # screen.blit(dragon_sprite, (100, dragoncenter_y - 128)) 
-  # screen.blit(dragon_sprite, (300, dragoncenter_y - 128))  # upper middle
-  # screen.blit(dragon_sprite, (500, dragoncenter_y - 128))
-  
-  # screen.blit(dragon_sprite, (100, dragoncenter_y + 128)) 
-  # screen.blit(dragon_sprite, (300, dragoncenter_y + 128))  # upper middle
-  # screen.blit(dragon_sprite, (500, dragoncenter_y + 128))
-  playerPartyPositions = [(110, center_y), (210, center_y), (310, center_y), (150, center_y + 200), (250, center_y + 200) , (350, center_y + 200)]
-  enemyPartyPositions = [(1600, center_y), (1500, center_y), (1400, center_y), (1650, center_y + 200), (1550, center_y + 200), (1450, center_y + 200)]
-  
+  # any sprite size = 32*3 = 96x96, offset = 96/2 = 48
+  # -96 needs to be changed as calculated by sprite size later!
+  leftPartPositions = [(110, center_y - 73), (210, center_y - 73), (310, center_y - 73), (150, center_y + 73), (250, center_y + 73) , (350, center_y + 73)]
+  rightPartyPositions = [(x-110-96, center_y - 73), (x-210-96, center_y - 73), (x-310-96, center_y - 73), (x-150-96, center_y + 73), (x-250-96, center_y + 73), (x-350-96, center_y + 73)]
+
   # keeping rep for later tests
   # render as surfaces to show hp, speed etc.
   rep = 0
@@ -106,14 +107,14 @@ def renderCombatScene(playerParty=None, enemyParty=None):
     sprite = findCharacterSprite(char)
     for i in range(6): 
       renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-      screen.blit(renderSprite, playerPartyPositions[rep])
+      screen.blit(renderSprite, leftPartPositions[rep])
       rep += 1
   rep = 0
   for char in enemyParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6):
       renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-      screen.blit(renderSprite, enemyPartyPositions[rep]) 
+      screen.blit(renderSprite, rightPartyPositions[rep]) 
       rep += 1
     
   pygame.display.flip()  # Update the display to show changes
