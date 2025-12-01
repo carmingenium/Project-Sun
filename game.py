@@ -32,17 +32,13 @@ def initializeGame():
 def initializeCharacters():
   #region charlist
 
-  # player = character.Character(
-  #   name="Blacked out Engineer",
-  #   speed=(5, 10),
-  #   skills=[],
-  #   supportSkills=[]
-  # )
+  # player: drunk engineer
   # head of sec
-  # 2 x sec off
-  # 2 x assistant
+  # sec off
+  # assistant
   # clown
   # mime
+  # Borg (default ~ can transform)
   # unknown
 
 

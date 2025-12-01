@@ -55,14 +55,15 @@ class Coin:
 
 
 class Character:
-  def __init__(self, name, sprite, speed, hp, skills=[], supportSkills=[]):
+  def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[]):
     self.name = name
     self.sprite = sprite
     self.speedRange = speed
     self.speed = 0 # calculated at turn start
     self.sanity = 0 # almost always starts as 0
     self.hp = hp
-    self.skills = skills
+    self.base_skills = base_skills
+    self.sig_skills = sig_skills
     self.supportSkills = supportSkills
 
   def add_skill(self, skill_name, level):
