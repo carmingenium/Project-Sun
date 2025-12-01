@@ -3,11 +3,13 @@ import random
 #region Skill
 
 class Skill:
-  def __init__(self, name, coinlist, coinpower, damage):
+  def __init__(self, name, coinlist, coinpower, damage, sprite, implementation):
     self.name = name
     self.coinlist = coinlist
     self.coinpower = coinpower
     self.damage = damage
+    self.implementation = implementation
+    self.sprite = sprite
     # animation (stop motion, so sprite list here for coins to select from maybe)
     
   def __repr__(self):
@@ -19,7 +21,8 @@ class Skill:
     return 
     
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-  
+
+#region Coin
 class Coin:
   def __init__(self, heads, tails, onhit, unbreakable=False):
     # heads, tails: list of effect dictionaries
@@ -32,6 +35,8 @@ class Coin:
 
   def __repr__(self):
     return f"Coin(unbreakable={self.unbreakable}, heads={self.heads}, tails={self.tails}, onhit={self.onhit})"
+
+# coin is not really compatible in this state, later will be reworked %99
 
 # Example usage:
 # coin = Coin(
@@ -50,10 +55,20 @@ class Coin:
 # possible additions:
   # flip coin function
   # 'type', 'value', 'effect', 'operation', 'duration', 'target' definitions 'support'
-  
+#endregion
 #endregion
 
+#region Skill Functions
 
+def test_skill():
+  print("Skill used!")
+  
+
+# list_of_funcs = [character.func1, character.func2, character.func3]
+# for func in list_of_funcs:
+#     func(param1, param2)
+
+#endregion
 class Character:
   def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[]):
     self.name = name

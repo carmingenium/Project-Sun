@@ -75,7 +75,8 @@ def initializeCharacters():
     sprite='sprites/engineer.png',
     speed=(3, 6),
     hp=100,
-    skills=[],
+    base_skills=[],
+    sig_skills=[],
     supportSkills=[]
   )
   characterslist.append(player)
@@ -84,7 +85,8 @@ def initializeCharacters():
     sprite='sprites/unknown.png',
     speed=(3, 7),
     hp=100,
-    skills=[],
+    base_skills=[character.test_skill],
+    sig_skills=[],
     supportSkills=[]
   )
   characterslist.append(unknown)
@@ -94,7 +96,8 @@ def initializeCharacters():
     sprite='sprites/spacedragon.png',
     speed=(4, 8),
     hp=150,
-    skills=[],
+    base_skills=[],
+    sig_skills=[],
     supportSkills=[]
   )
   characterslist.append(spacedragon)
