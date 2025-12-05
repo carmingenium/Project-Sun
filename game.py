@@ -1,32 +1,41 @@
+import os
 import pygame
 import character
 import renderer
 
-print("Imported:", renderer)
-print("Path:", renderer.__file__)
-print("Members:", dir(renderer))
-
-
 
 #region Variables
+skillslist = []
 # list of all encounters & characters
 characterslist = []
 spriteslist = []
-skillslist = []
+
 # party
 playerParty = []
 encounterParty = []
+# dialogues
+dialogueList = []
+
 #endregion
 
 def initializeGame():
-  # initialize story text
-  with open("story/test.txt", "r", encoding="utf-8") as f: # load text
+  
+  # loading all story files - reserved for later
+  
+  # story_dir = "story"
+  # for filename in os.listdir(story_dir): 
+  #   if filename.endswith(".txt"):
+  #     with open(os.path.join(story_dir, filename), "r", encoding="utf-8") as f:
+  #       dialog_lines = [line.strip() for line in f.readlines()]
+  #       dialogueList.append((filename, dialog_lines))
+  
+  with open("story/test.txt", "r", encoding="utf-8") as f:
     dialog_lines = [line.strip() for line in f.readlines()]
-  # font = pygame.font.Font(None, 32)   # None = default font, 32 = size
+  
   # initialize characters
   initializeCharacters()
   playerParty.append(characterslist[0]) # main character
-  encounterParty.append(characterslist[1]) # unknown
+  encounterParty.append(characterslist[1]) # 'unknown' character
   
   
 def initializeCharacters():
@@ -107,12 +116,8 @@ def initializeCharacters():
 
 
   renderer.spriteListInitialize(characterslist)
-  renderer.skillSpriteInitialize(skillslist) # no skills for now
+  renderer.skillSpriteInitialize(skillslist)
   return
-
-def getCharacterList():
-  return characterslist
-
 
 def main():
   initializeGame()

@@ -19,8 +19,6 @@ class Skill:
     # chance = user.sp + 50 
     # random coinflip with 'chance' for every coin
     return 
-    
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
 
 #region Coin
 class Coin:
@@ -91,7 +89,6 @@ class Character:
     # speed var is a range, get a random value within that range
     currentSpeed = random.randint(self.speedRange[0], self.speedRange[1])
     self.speed = currentSpeed
-    #debuffs might be applied here in the future
     return currentSpeed
     
   def get_skills(self):
@@ -111,3 +108,4 @@ class Character:
 def initialize_characters(renderer):
   character_list = []
   return character_list
+#endregion

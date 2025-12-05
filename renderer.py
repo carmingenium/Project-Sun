@@ -11,11 +11,7 @@ center_y = y // 2
 
 
 
-# sprite loading # later done from game.py
-def initializeRenderer():
-  global dragon_sprite, dragon_sprite_big, unknown_sprite
-  return
-
+# sprite loading 
 dragon_sprite = pygame.image.load('sprites/spacedragon.png').convert() # 64x64 so double of a normal human
 dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_width()*2, dragon_sprite.get_height()*2))# 128x128
 unknown_sprite = pygame.image.load('sprites/unknown.png').convert() # 32x32
@@ -52,7 +48,7 @@ dragoncenter_x = center_x - (dragon_sprite.get_width() // 2)
 
 clock = pygame.time.Clock() # frame rate controller
 
-# for dialogues
+# for dialogues 
 renderposRight = (1400, 200)
 renderposLeft = (100, 200)
 
@@ -91,14 +87,14 @@ def findSkillSprite(skill):
 
 def RenderCharacterSurface(character, sprite):
   renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-  statSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA)
+  statSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA) 
   statSurface.blit(renderSprite, (50,25))
   font = pygame.font.Font(None, 24)
   # sanity
   statSurface.blit(font.render(f"{character.sanity}", True, (137, 207, 240)), (120, renderSprite.get_height() + 25))
-  #hp
+  # hp
   statSurface.blit(font.render(f"{character.hp}", True, (238, 75, 43)), (80, renderSprite.get_height() + 25))
-  #speed
+  # speed
   statSurface.blit(font.render(f"{character.calculate_speed()}", True, (255, 255, 255)), (60, renderSprite.get_height() + 25))
   return statSurface
 
@@ -161,9 +157,9 @@ def renderCombatScene(playerParty=None, enemyParty=None):
     sprite = findCharacterSprite(char)
     for i in range(6): 
       CharacterSurface = RenderCharacterSurface(char, sprite)
-      skillSurface = BaseSkillSurface(char, sprite)
+      skillSurface = BaseSkillSurface(char)
       screen.blit(CharacterSurface, leftPartPositions[rep])
-      screen.blit(skillSurface, (leftPartPositions[rep][0], leftPartPositions[rep][1] - 80)) # higher than character 
+      screen.blit(skillSurface, (leftPartPositions[rep][0]+50, leftPartPositions[rep][1] - 80 + 25)) # positions are defined for left corners, so need to have function or a system to handle centering and offsets for left aligned rendering
       rep += 1
   rep = 0
   for char in enemyParty or []:
