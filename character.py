@@ -60,8 +60,9 @@ class Coin:
 
 #region Skill Functions
 
-def test_skill():
-  print("Skill used!")
+def engineer_wrench_skill(user, target):
+  target.take_damage(15) #get dmg from skill object
+  return
   
 
 # list_of_funcs = [character.func1, character.func2, character.func3]
@@ -69,6 +70,7 @@ def test_skill():
 #     func(param1, param2)
 
 #endregion
+
 class Character:
   def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[]):
     self.name = name
@@ -95,6 +97,17 @@ class Character:
   def get_skills(self):
     return [(s.name, s.level) for s in self.skills]
   
+  def take_damage(self, damage):
+    self.hp -= damage
+    if self.hp < 0:
+      self.hp = 0
+      # death
+    return self.hp
   
   
   
+  
+#region CHARACTER INITIALIZATION
+def initialize_characters(renderer):
+  character_list = []
+  return character_list

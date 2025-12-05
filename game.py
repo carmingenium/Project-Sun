@@ -12,7 +12,7 @@ print("Members:", dir(renderer))
 # list of all encounters & characters
 characterslist = []
 spriteslist = []
-
+skillslist = []
 # party
 playerParty = []
 encounterParty = []
@@ -75,17 +75,19 @@ def initializeCharacters():
     sprite='sprites/engineer.png',
     speed=(3, 6),
     hp=100,
-    base_skills=[],
+    base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
     sig_skills=[],
     supportSkills=[]
   )
+  skillslist.append(player.base_skills[0])
   characterslist.append(player)
+  
   unknown = character.Character(
     name="Unknown",
     sprite='sprites/unknown.png',
     speed=(3, 7),
     hp=100,
-    base_skills=[character.test_skill],
+    base_skills=[],
     sig_skills=[],
     supportSkills=[]
   )
@@ -105,7 +107,9 @@ def initializeCharacters():
 
 
   renderer.spriteListInitialize(characterslist)
+  renderer.skillSpriteInitialize(skillslist) # no skills for now
   return
+
 def getCharacterList():
   return characterslist
 

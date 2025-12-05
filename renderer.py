@@ -1,5 +1,6 @@
 import pygame
 import character
+
 # initialization
 pygame.init()
 x = 1920
@@ -20,19 +21,31 @@ dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_wid
 unknown_sprite = pygame.image.load('sprites/unknown.png').convert() # 32x32
 
 
-sprites = []
+character_sprites = []
 characterList = []
 def spriteListInitialize(characters):
-  global characterList, sprites
+  global characterList, character_sprites
   for char in characters:
     try:
-      sprites.append(pygame.image.load(char.sprite).convert())
+      character_sprites.append(pygame.image.load(char.sprite).convert())
       print(f"Loaded sprite for {char.name} from path {char.sprite}")
     except: 
       print(f"Error loading sprite for {char.name} from path {char.sprite}") 
   characterList = characters
 
-
+skill_sprites = []
+skillList = []
+def skillSpriteInitialize(skills):
+  global skillList, skill_sprites
+  for skill in skills:
+    try:
+      skill_sprites.append(pygame.image.load(skill.sprite).convert())
+      print(f"Loaded sprite for skill {skill.name} from path {skill.sprite}")
+    except: 
+      print(f"Error loading sprite for skill {skill.name} from path {skill.sprite}")
+  skillList = skills
+  
+  
 # vars
 dragoncenter_y = center_y - (dragon_sprite.get_height() // 2)
 dragoncenter_x = center_x - (dragon_sprite.get_width() // 2)
@@ -66,7 +79,46 @@ def findCharacterSprite(character):
   for char in characterList:
     if char.name == character.name:
       index = characterList.index(char)
-      return sprites[index]
+      return character_sprites[index]
+    
+def findSkillSprite(skill):
+  for sk in skillList:
+    if sk.name == skill.name:
+      index = skillList.index(sk)
+      return skill_sprites[index]
+
+
+
+def RenderCharacterSurface(character, sprite):
+  renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
+  statSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA)
+  statSurface.blit(renderSprite, (50,25))
+  font = pygame.font.Font(None, 24)
+  # sanity
+  statSurface.blit(font.render(f"{character.sanity}", True, (137, 207, 240)), (120, renderSprite.get_height() + 25))
+  #hp
+  statSurface.blit(font.render(f"{character.hp}", True, (238, 75, 43)), (80, renderSprite.get_height() + 25))
+  #speed
+  statSurface.blit(font.render(f"{character.calculate_speed()}", True, (255, 255, 255)), (60, renderSprite.get_height() + 25))
+  return statSurface
+
+def BaseSkillSurface(character): # alignment problems because of magic numbers, tomorrows problem
+  # game.py needs to calculate skills that will be shown here later
+  skillSurface = pygame.Surface((32, 80), pygame.SRCALPHA)
+  skillSprite = findSkillSprite(character.base_skills[0])
+  
+  skillSurface.blit(skillSprite, (0,0))
+  skillSurface.blit(skillSprite, (0,32))
+  # for skill in character.base_skills:
+  #   skillSprite = findSkillSprite(skill)
+  #   renderSprite = pygame.transform.scale(skillSprite, (skillSprite.get_width(), skillSprite.get_height()))
+  #   skillSurface.blit(renderSprite, (0,0))
+  return skillSurface
+
+
+
+
+
 
 def renderNovelScene(character, dialogue_line):
   # start drawing
@@ -93,7 +145,7 @@ def renderNovelScene(character, dialogue_line):
   
   
   pygame.display.flip()  # Update the display to show changes
-  
+
 def renderCombatScene(playerParty=None, enemyParty=None):
   # testing render
   # any sprite size = 32*3 = 96x96, offset = 96/2 = 48
@@ -108,17 +160,10 @@ def renderCombatScene(playerParty=None, enemyParty=None):
   for char in playerParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6): 
-      renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-      spriteSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA)
-      spriteSurface.blit(renderSprite, (50,25))
-      font = pygame.font.Font(None, 24)
-      # sanity
-      spriteSurface.blit(font.render(f"{char.sanity}", True, (137, 207, 240)), (120, renderSprite.get_height() + 25))
-      #hp
-      spriteSurface.blit(font.render(f"{char.hp}", True, (238, 75, 43)), (80, renderSprite.get_height() + 25))
-      #speed
-      spriteSurface.blit(font.render(f"{char.calculate_speed()}", True, (255, 255, 255)), (60, renderSprite.get_height() + 25))
-      screen.blit(spriteSurface, leftPartPositions[rep])
+      CharacterSurface = RenderCharacterSurface(char, sprite)
+      skillSurface = BaseSkillSurface(char, sprite)
+      screen.blit(CharacterSurface, leftPartPositions[rep])
+      screen.blit(skillSurface, (leftPartPositions[rep][0], leftPartPositions[rep][1] - 80)) # higher than character 
       rep += 1
   rep = 0
   for char in enemyParty or []:
