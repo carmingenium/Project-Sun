@@ -9,12 +9,17 @@ screen = pygame.display.set_mode((x, y)) # this has to be static as long as the 
 center_x = x // 2
 center_y = y // 2
 
+sprite_size = 160 # 32*5 - defined so that positions can be calculated from this variable.
 
+
+# for dialogues 
+renderposRight = (1400, 200)
+renderposLeft = (100, 200)
 
 # sprite loading 
-dragon_sprite = pygame.image.load('sprites/spacedragon.png').convert() # 64x64 so double of a normal human
-dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_width()*2, dragon_sprite.get_height()*2))# 128x128
-unknown_sprite = pygame.image.load('sprites/unknown.png').convert() # 32x32
+# dragon_sprite = pygame.image.load('sprites/spacedragon.png').convert_alpha() # 64x64 so double of a normal human
+# dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_width()*2, dragon_sprite.get_height()*2))# 128x128
+# unknown_sprite = pygame.image.load('sprites/unknown.png').convert_alpha() # 32x32
 
 
 character_sprites = []
@@ -23,7 +28,7 @@ def spriteListInitialize(characters):
   global characterList, character_sprites
   for char in characters:
     try:
-      character_sprites.append(pygame.image.load(char.sprite).convert())
+      character_sprites.append(pygame.image.load(char.sprite).convert_alpha())
       print(f"Loaded sprite for {char.name} from path {char.sprite}")
     except: 
       print(f"Error loading sprite for {char.name} from path {char.sprite}") 
@@ -35,23 +40,11 @@ def skillSpriteInitialize(skills):
   global skillList, skill_sprites
   for skill in skills:
     try:
-      skill_sprites.append(pygame.image.load(skill.sprite).convert())
+      skill_sprites.append(pygame.image.load(skill.sprite).convert_alpha())
       print(f"Loaded sprite for skill {skill.name} from path {skill.sprite}")
     except: 
       print(f"Error loading sprite for skill {skill.name} from path {skill.sprite}")
   skillList = skills
-  
-  
-# vars
-dragoncenter_y = center_y - (dragon_sprite.get_height() // 2)
-dragoncenter_x = center_x - (dragon_sprite.get_width() // 2)
-
-clock = pygame.time.Clock() # frame rate controller
-
-# for dialogues 
-renderposRight = (1400, 200)
-renderposLeft = (100, 200)
-
 
 
 
@@ -84,27 +77,58 @@ def findSkillSprite(skill):
       return skill_sprites[index]
 
 
-
+#region old char surface
+#   renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
+#   offset = (100,50)
+#   statSurface = pygame.Surface((sprite_size+offset[0], sprite_size+offset[1]), pygame.SRCALPHA) 
+#   statSurface.blit(renderSprite, (offset[0]//2, offset[1]//2))
+#   font = pygame.font.Font(None, 24)
+#   # sanity
+#   statSurface.blit(font.render(f"{character.sanity}", True, (137, 207, 240)), ((offset[0] + sprite_size)*4/6, sprite_size + offset[1]//2)) # 120
+#   # hp
+#   statSurface.blit(font.render(f"{character.hp}", True, (238, 75, 43)), ((offset[0] + sprite_size)*2/6, sprite_size + offset[1]//2)) # 80
+#   # speed
+#   statSurface.blit(font.render(f"{character.calculate_speed()}", True, (255, 255, 255)), ((offset[0] + sprite_size)*1/6, sprite_size + offset[1]//2)) # 60
+#   return statSurface, offset
+#endregion
 def RenderCharacterSurface(character, sprite):
-  renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
-  statSurface = pygame.Surface((renderSprite.get_width()+100, renderSprite.get_height()+50), pygame.SRCALPHA) 
-  statSurface.blit(renderSprite, (50,25))
-  font = pygame.font.Font(None, 24)
+  fontSize = 32
+  renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
+  charSurface = pygame.Surface((sprite_size, sprite_size+fontSize), pygame.SRCALPHA) 
+  charSurface.blit(renderSprite, (0,0)) # character sprite render
+  font = pygame.font.Font(None, fontSize)
+  
+  # text rendering does not feel well placed, centering does not feel perfect.
+
+  # text for stats
+  sanity_text = font.render(f"{character.sanity}", True, (137, 207, 240))
+  hp_text = font.render(f"{character.hp}", True, (238, 75, 43))
+  speed_text = font.render(f"{character.calculate_speed()}", True, (255, 255, 255))
+  # space for stats
+  sanity_space = pygame.Rect((sprite_size)*6/8, sprite_size, sprite_size/8, fontSize)
+  hp_space= pygame.Rect((sprite_size)*3/8, sprite_size, sprite_size*2/8, fontSize) 
+  speed_space = pygame.Rect((sprite_size)*1/8, sprite_size, sprite_size/8, fontSize)
+  # centered rect
+  sanity_centered = sanity_text.get_rect(center=sanity_space.center)
+  hp_centered = hp_text.get_rect(center=hp_space.center)
+  speed_centered = speed_text.get_rect(center=speed_space.center)
+  
   # sanity
-  statSurface.blit(font.render(f"{character.sanity}", True, (137, 207, 240)), (120, renderSprite.get_height() + 25))
+  charSurface.blit(sanity_text, sanity_centered) # 120
   # hp
-  statSurface.blit(font.render(f"{character.hp}", True, (238, 75, 43)), (80, renderSprite.get_height() + 25))
+  charSurface.blit(hp_text, hp_centered) # 80
   # speed
-  statSurface.blit(font.render(f"{character.calculate_speed()}", True, (255, 255, 255)), (60, renderSprite.get_height() + 25))
-  return statSurface
+  charSurface.blit(speed_text, speed_centered) # 60
+  return charSurface
 
 def BaseSkillSurface(character): # alignment problems because of magic numbers, tomorrows problem
   # game.py needs to calculate skills that will be shown here later
-  skillSurface = pygame.Surface((32, 80), pygame.SRCALPHA)
+  skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
   skillSprite = findSkillSprite(character.base_skills[0])
+  renderSkillSprite = pygame.transform.scale(skillSprite, (32, 32))
   
-  skillSurface.blit(skillSprite, (0,0))
-  skillSurface.blit(skillSprite, (0,32))
+  skillSurface.blit(renderSkillSprite, (0,0))
+  skillSurface.blit(renderSkillSprite, (0,32))
   # for skill in character.base_skills:
   #   skillSprite = findSkillSprite(skill)
   #   renderSprite = pygame.transform.scale(skillSprite, (skillSprite.get_width(), skillSprite.get_height()))
@@ -143,12 +167,11 @@ def renderNovelScene(character, dialogue_line):
   pygame.display.flip()  # Update the display to show changes
 
 def renderCombatScene(playerParty=None, enemyParty=None):
-  # testing render
-  # any sprite size = 32*3 = 96x96, offset = 96/2 = 48
-  # -96 needs to be changed as calculated by sprite size later!
-  # -73 also! (its 96/2 + 25 offset)
-  leftPartPositions = [(110, center_y - 73), (210, center_y - 73), (310, center_y - 73), (150, center_y + 73), (250, center_y + 73) , (350, center_y + 73)]
-  rightPartyPositions = [(x-110-96, center_y - 73), (x-210-96, center_y - 73), (x-310-96, center_y - 73), (x-150-96, center_y + 73), (x-250-96, center_y + 73), (x-350-96, center_y + 73)]
+  offset = (100, 50)
+  leftPartyPositions = [(offset[0], center_y - sprite_size*3//4), (offset[0] + sprite_size, center_y - sprite_size*3//4), (offset[0] + sprite_size*2, center_y - sprite_size*3//4),
+                       (offset[0]*3//2, center_y + sprite_size*3//4), (offset[0]*3//2 + sprite_size, center_y + sprite_size*3//4) , (offset[0]*3//2 + sprite_size*2, center_y + sprite_size*3//4)]
+  rightPartyPositions = [(x - offset[0] - sprite_size, center_y - sprite_size*3//4), (x - offset[0] - sprite_size*2, center_y - sprite_size*3//4), (x - offset[0] - sprite_size*3, center_y - sprite_size*3//4),
+                         (x - offset[0]*3//2 - sprite_size, center_y + sprite_size*3//4), (x - offset[0]*3//2 - sprite_size*2, center_y + sprite_size*3//4), (x - offset[0]*3//2 - sprite_size*3, center_y + sprite_size*3//4)]
 
   # keeping rep for later tests
   # render as surfaces to show hp, speed etc.
@@ -158,14 +181,15 @@ def renderCombatScene(playerParty=None, enemyParty=None):
     for i in range(6): 
       CharacterSurface = RenderCharacterSurface(char, sprite)
       skillSurface = BaseSkillSurface(char)
-      screen.blit(CharacterSurface, leftPartPositions[rep])
-      screen.blit(skillSurface, (leftPartPositions[rep][0]+50, leftPartPositions[rep][1] - 80 + 25)) # positions are defined for left corners, so need to have function or a system to handle centering and offsets for left aligned rendering
+      skillSize = skillSurface.get_width()
+      screen.blit(CharacterSurface, leftPartyPositions[rep])
+      screen.blit(skillSurface, (leftPartyPositions[rep][0]+(sprite_size//2)-(skillSize//2), leftPartyPositions[rep][1]-(skillSize*2)))
       rep += 1
   rep = 0
   for char in enemyParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6):
-      renderSprite = pygame.transform.scale(sprite, (sprite.get_width()*3, sprite.get_height()*3))
+      renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
       screen.blit(renderSprite, rightPartyPositions[rep]) 
       rep += 1
     
