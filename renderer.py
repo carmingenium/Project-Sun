@@ -1,6 +1,7 @@
 import pygame
 import character
 
+
 # initialization
 pygame.init()
 x = 1920
@@ -10,16 +11,16 @@ center_x = x // 2
 center_y = y // 2
 
 sprite_size = 160 # 32*5 - defined so that positions can be calculated from this variable.
-
+skill_size = 32 # per skill 
 
 # for dialogues 
 renderposRight = (1400, 200)
 renderposLeft = (100, 200)
 
-# sprite loading 
-# dragon_sprite = pygame.image.load('sprites/spacedragon.png').convert_alpha() # 64x64 so double of a normal human
-# dragon_sprite_big = pygame.transform.scale(dragon_sprite, (dragon_sprite.get_width()*2, dragon_sprite.get_height()*2))# 128x128
-# unknown_sprite = pygame.image.load('sprites/unknown.png').convert_alpha() # 32x32
+combatBackGround = pygame.image.load('sprites/backgrounds/combat_test.png').convert()
+
+#endregion 
+
 
 
 character_sprites = []
@@ -103,7 +104,7 @@ def RenderCharacterSurface(character, sprite):
   # text for stats
   sanity_text = font.render(f"{character.sanity}", True, (137, 207, 240))
   hp_text = font.render(f"{character.hp}", True, (238, 75, 43))
-  speed_text = font.render(f"{character.calculate_speed()}", True, (255, 255, 255))
+  speed_text = font.render(f"{character.calculate_speed()}", True, (255, 255, 255)) # calculation will be moved to game.py when turn system is implemented.
   # space for stats
   sanity_space = pygame.Rect((sprite_size)*6/8, sprite_size, sprite_size/8, fontSize)
   hp_space= pygame.Rect((sprite_size)*3/8, sprite_size, sprite_size*2/8, fontSize) 
@@ -121,18 +122,39 @@ def RenderCharacterSurface(character, sprite):
   charSurface.blit(speed_text, speed_centered) # 60
   return charSurface
 
-def BaseSkillSurface(character): # alignment problems because of magic numbers, tomorrows problem
+def BaseSkillSurface(character, globalPosition): # alignment problems because of magic numbers, tomorrows problem
   # game.py needs to calculate skills that will be shown here later
   skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
-  skillSprite = findSkillSprite(character.base_skills[0])
+  
+  # collision detection
+  rects = []
+  
+  rect1 = pygame.Rect(globalPosition[0], globalPosition[1], 32, 32)
+  rects.append(rect1)
+  rect2 = pygame.Rect(globalPosition[0], globalPosition[1]+32, 32, 32)
+  rects.append(rect2)
+  
+  skillSprite = findSkillSprite(character.base_skills[0]) 
   renderSkillSprite = pygame.transform.scale(skillSprite, (32, 32))
   
-  skillSurface.blit(renderSkillSprite, (0,0))
-  skillSurface.blit(renderSkillSprite, (0,32))
+  for rect in rects:
+    if rect.collidepoint(pygame.mouse.get_pos()):
+      highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+      highlight.fill((0, 250, 0, 120))  # semi-transparent green
+      skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    skillSurface.blit(renderSkillSprite, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
+        
+  # skillSurface.blit(renderSkillSprite, (0,0))
+  # skillSurface.blit(renderSkillSprite, (0,32))
+  
+  
+  
+  #region future notes
   # for skill in character.base_skills:
   #   skillSprite = findSkillSprite(skill)
   #   renderSprite = pygame.transform.scale(skillSprite, (skillSprite.get_width(), skillSprite.get_height()))
   #   skillSurface.blit(renderSprite, (0,0))
+  #endregion
   return skillSurface
 
 
@@ -167,6 +189,9 @@ def renderNovelScene(character, dialogue_line):
   pygame.display.flip()  # Update the display to show changes
 
 def renderCombatScene(playerParty=None, enemyParty=None):
+  combatBGRender = pygame.transform.scale(combatBackGround, (x, y))
+  screen.blit(combatBGRender, (0, 0))  # Draw the background image
+  
   offset = (100, 50)
   leftPartyPositions = [(offset[0], center_y - sprite_size*3//4), (offset[0] + sprite_size, center_y - sprite_size*3//4), (offset[0] + sprite_size*2, center_y - sprite_size*3//4),
                        (offset[0]*3//2, center_y + sprite_size*3//4), (offset[0]*3//2 + sprite_size, center_y + sprite_size*3//4) , (offset[0]*3//2 + sprite_size*2, center_y + sprite_size*3//4)]
@@ -179,11 +204,20 @@ def renderCombatScene(playerParty=None, enemyParty=None):
   for char in playerParty or []:
     sprite = findCharacterSprite(char)
     for i in range(6): 
-      CharacterSurface = RenderCharacterSurface(char, sprite)
-      skillSurface = BaseSkillSurface(char)
-      skillSize = skillSurface.get_width()
-      screen.blit(CharacterSurface, leftPartyPositions[rep])
-      screen.blit(skillSurface, (leftPartyPositions[rep][0]+(sprite_size//2)-(skillSize//2), leftPartyPositions[rep][1]-(skillSize*2)))
+      # render positions
+      CharacterPosition = leftPartyPositions[rep]
+      SkillsPosition = (leftPartyPositions[rep][0]+(sprite_size//2)-(skill_size//2), leftPartyPositions[rep][1]-(skill_size*2))
+      
+      # surface prep & collision
+      characterSurface = RenderCharacterSurface(char, sprite)
+      skillSurface = BaseSkillSurface(char, SkillsPosition)
+      
+      
+
+      # character render
+      screen.blit(characterSurface, CharacterPosition)
+      # skill render
+      screen.blit(skillSurface, SkillsPosition)
       rep += 1
   rep = 0
   for char in enemyParty or []:
@@ -195,8 +229,3 @@ def renderCombatScene(playerParty=None, enemyParty=None):
     
   pygame.display.flip()  # Update the display to show changes
 #endregion
-
-def main():
-  return
-
-main()

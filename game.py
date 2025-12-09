@@ -3,6 +3,10 @@ import pygame
 import character
 import renderer
 
+# constants
+FPS = 60
+
+
 
 #region Variables
 skillslist = []
@@ -28,6 +32,12 @@ def initializeGame():
   #     with open(os.path.join(story_dir, filename), "r", encoding="utf-8") as f:
   #       dialog_lines = [line.strip() for line in f.readlines()]
   #       dialogueList.append((filename, dialog_lines))
+  
+  pygame.init()
+  global clock
+  clock = pygame.time.Clock()
+  
+  pygame.display.set_caption("Project Sun")
   
   with open("story/test.txt", "r", encoding="utf-8") as f:
     dialog_lines = [line.strip() for line in f.readlines()]
@@ -81,7 +91,7 @@ def initializeCharacters():
   #endregion
   player = character.Character(
     name="Blacked out Engineer",
-    sprite='sprites/engineer.png',
+    sprite='sprites/characters/engineer.png',
     speed=(3, 6),
     hp=100,
     base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
@@ -93,7 +103,7 @@ def initializeCharacters():
   
   unknown = character.Character(
     name="Unknown",
-    sprite='sprites/unknown.png',
+    sprite='sprites/characters/unknown.png',
     speed=(3, 7),
     hp=100,
     base_skills=[],
@@ -104,7 +114,7 @@ def initializeCharacters():
 
   spacedragon = character.Character(
     name="Space Dragon",
-    sprite='sprites/spacedragon.png',
+    sprite='sprites/characters/spacedragon.png',
     speed=(4, 8),
     hp=150,
     base_skills=[],
@@ -123,13 +133,13 @@ def main():
   initializeGame()
   running = True
   # renderer.renderNovelScene(0, "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
-  renderer.renderCombatScene(playerParty, encounterParty)
+  # renderer.renderCombatScene(playerParty, encounterParty)
   while running:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         running = False
-
-  # clock.tick(60)  # Limit to 60 frames per second
+    renderer.renderCombatScene(playerParty, encounterParty)
+    clock.tick(FPS)  # Limit to 60 frames per second
   return
 
 main()
