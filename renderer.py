@@ -19,6 +19,9 @@ renderposLeft = (100, 200)
 
 combatBackGround = pygame.image.load('sprites/backgrounds/combat_test.png').convert()
 
+
+selected_skill_pos = None
+
 #endregion 
 
 
@@ -53,12 +56,11 @@ def skillSpriteInitialize(skills):
 #region rendering functions
 
 #region NOTES
-# positional hypothesis:
+# positional calculations
 # to put it in the middle in y axis: 540 - (sprite_height / 2)
 # to put it in the middle in x axis: 960 - (sprite_width / 2)
 # normal characters are 32x32, might get scaled
 # the position sprites are drawn are from top-left of the sprites. so x can be closer to 0 and y needs to be further down than usual
-# testing values
 #endregion
 
 def spriteNovelify(sprite):
@@ -77,21 +79,7 @@ def findSkillSprite(skill):
       index = skillList.index(sk)
       return skill_sprites[index]
 
-
-#region old char surface
-#   renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
-#   offset = (100,50)
-#   statSurface = pygame.Surface((sprite_size+offset[0], sprite_size+offset[1]), pygame.SRCALPHA) 
-#   statSurface.blit(renderSprite, (offset[0]//2, offset[1]//2))
-#   font = pygame.font.Font(None, 24)
-#   # sanity
-#   statSurface.blit(font.render(f"{character.sanity}", True, (137, 207, 240)), ((offset[0] + sprite_size)*4/6, sprite_size + offset[1]//2)) # 120
-#   # hp
-#   statSurface.blit(font.render(f"{character.hp}", True, (238, 75, 43)), ((offset[0] + sprite_size)*2/6, sprite_size + offset[1]//2)) # 80
-#   # speed
-#   statSurface.blit(font.render(f"{character.calculate_speed()}", True, (255, 255, 255)), ((offset[0] + sprite_size)*1/6, sprite_size + offset[1]//2)) # 60
-#   return statSurface, offset
-#endregion
+#region Rendering
 def RenderCharacterSurface(character, sprite):
   fontSize = 32
   renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
@@ -100,7 +88,6 @@ def RenderCharacterSurface(character, sprite):
   font = pygame.font.Font(None, fontSize)
   
   # text rendering does not feel well placed, centering does not feel perfect.
-
   # text for stats
   sanity_text = font.render(f"{character.sanity}", True, (137, 207, 240))
   hp_text = font.render(f"{character.hp}", True, (238, 75, 43))
@@ -122,45 +109,158 @@ def RenderCharacterSurface(character, sprite):
   charSurface.blit(speed_text, speed_centered) # 60
   return charSurface
 
-def BaseSkillSurface(character, globalPosition): # alignment problems because of magic numbers, tomorrows problem
+def BaseSkillSurface(character, globalPosition, collisionPos=None):
   # game.py needs to calculate skills that will be shown here later
   skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
   
-  # collision detection
+  # Skill Grouping
   rects = []
-  
-  rect1 = pygame.Rect(globalPosition[0], globalPosition[1], 32, 32)
+  rect1 = pygame.Rect(globalPosition[0], globalPosition[1], skill_size, skill_size)
   rects.append(rect1)
-  rect2 = pygame.Rect(globalPosition[0], globalPosition[1]+32, 32, 32)
+  rect2 = pygame.Rect(globalPosition[0], globalPosition[1]+skill_size, skill_size, skill_size)
   rects.append(rect2)
   
   skillSprite = findSkillSprite(character.base_skills[0]) 
-  renderSkillSprite = pygame.transform.scale(skillSprite, (32, 32))
+  renderSkillSprite = pygame.transform.scale(skillSprite, (skill_size, skill_size))
   
   for rect in rects:
-    if rect.collidepoint(pygame.mouse.get_pos()):
+    if(selected_skill_pos == (rect.x, rect.y)):
       highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-      highlight.fill((0, 250, 0, 120))  # semi-transparent green
+      highlight.fill((255, 255, 255, 255)) # white background
+      skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    elif rect.collidepoint(collisionPos or (0,0)):
+      highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+      highlight.fill((255, 255, 255, 120)) # semi-transparent white
       skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
     skillSurface.blit(renderSkillSprite, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
-        
-  # skillSurface.blit(renderSkillSprite, (0,0))
-  # skillSurface.blit(renderSkillSprite, (0,32))
-  
-  
-  
-  #region future notes
-  # for skill in character.base_skills:
-  #   skillSprite = findSkillSprite(skill)
-  #   renderSprite = pygame.transform.scale(skillSprite, (skillSprite.get_width(), skillSprite.get_height()))
-  #   skillSurface.blit(renderSprite, (0,0))
-  #endregion
   return skillSurface
 
+def SignatureSkillSurface(character, globalPosition, collisionPos=None):
+  # game.py needs to calculate skills that will be shown here later
+  skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
+  
+  rect = pygame.Rect(globalPosition[0], globalPosition[1], 32, 64)
+  
+  skillSprite = findSkillSprite(character.sig_skills[0]) 
+  renderSkillSprite = pygame.transform.scale(skillSprite, (32, 64))
+  if(selected_skill_pos == (rect.x, rect.y)):
+    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    highlight.fill((255, 255, 255, 255)) # white background
+    skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+  elif rect.collidepoint(collisionPos or (0,0)):
+    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    highlight.fill((255, 255, 255, 120)) # semi-transparent white
+    skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+  skillSurface.blit(renderSkillSprite, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
+  return skillSurface
+#endregion
+
+def CombatSpriteTransformCalculation(): # calculate all positions
+  offset = (100, 50)
+  # region return values
+  CombatBGPos = (0, 0)
+  
+  leftPartyPositions = [(offset[0], center_y - sprite_size), (offset[0] + sprite_size, center_y - sprite_size), (offset[0] + sprite_size*2, center_y - sprite_size),
+                       (offset[0]*3//2, center_y + sprite_size), (offset[0]*3//2 + sprite_size, center_y + sprite_size) , (offset[0]*3//2 + sprite_size*2, center_y + sprite_size)]
+  rightPartyPositions = [(x - offset[0] - sprite_size, center_y - sprite_size), (x - offset[0] - sprite_size*2, center_y - sprite_size), (x - offset[0] - sprite_size*3, center_y - sprite_size),
+                         (x - offset[0]*3//2 - sprite_size, center_y + sprite_size), (x - offset[0]*3//2 - sprite_size*2, center_y + sprite_size), (x - offset[0]*3//2 - sprite_size*3, center_y + sprite_size)]
+
+  leftPartyBaseSkillPositions = []
+  leftPartySignatureSkillPositions = []
+  
+  rightPartyBaseSkillPositions = []
+  rightPartySignatureSkillPositions = []
+  #endregion
+  for pos in leftPartyPositions:
+    baseSkillPos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+    baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+    sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+    
+    leftPartyBaseSkillPositions.append(baseSkillPos)
+    leftPartyBaseSkillPositions.append(baseSkill_2_Pos)
+    leftPartySignatureSkillPositions.append(sigSkillPos)
+  
+  for pos in rightPartyPositions:
+    baseSkillPos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+    baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+    sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+    
+    rightPartyBaseSkillPositions.append(baseSkillPos)
+    rightPartyBaseSkillPositions.append(baseSkill_2_Pos)
+    rightPartySignatureSkillPositions.append(sigSkillPos)
+    
+  
+  return CombatBGPos, leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions
+
+#region Collision Handling
+
+
+def DetectCombatCollision(leftPartyPositions=None, rightPartyPositions=None, leftPartyBaseSkillPositions=None, leftPartySignatureSkillPositions=None, rightPartyBaseSkillPositions=None, rightPartySignatureSkillPositions=None, playerParty=None, enemyParty=None, click=False):
+  # check for collisions on all characters & skills
+  mouse_pos = pygame.mouse.get_pos()
+  
+  # define rects for all characters & skills
+  
+  # currently no character interaction - commented
+    # for pos in leftPartyPositions or []:
+    #   rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
+    #   if rect.collidepoint(mouse_pos):
+    #     pass
+    # for pos in rightPartyPositions or []:
+    #   rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
+    #   if rect.collidepoint(mouse_pos):
+    #     pass
+  
+  for pos in leftPartyBaseSkillPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size)
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleBaseSkillClick(pos)
+      return (pos)
+  for pos in leftPartySignatureSkillPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size*2) # signature skill is taller
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleSignatureSkillClick(pos)
+      return (pos)
+  
+  for pos in rightPartyBaseSkillPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size)
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleBaseSkillClick(pos)
+      return (pos)
+  for pos in rightPartySignatureSkillPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size*2) # signature skill is taller
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleSignatureSkillClick(pos)
+      return (pos)
+  return None
+
+def HandleBaseSkillClick(clickPos):
+  # logic to handle base skill click
+  global selected_skill_pos
+  selected_skill_pos = clickPos
+  return selected_skill_pos
+
+def HandleSignatureSkillClick(clickPos):
+  # logic to handle signature skill collision
+  global selected_skill_pos
+  selected_skill_pos = clickPos
+  return selected_skill_pos
 
 
 
 
+def ClickEvent(leftPartyPositions=None, rightPartyPositions=None, leftPartyBaseSkillPositions=None, leftPartySignatureSkillPositions=None, rightPartyBaseSkillPositions=None, rightPartySignatureSkillPositions=None, playerParty=None, enemyParty=None):
+  clickPos = DetectCombatCollision(leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions, playerParty, enemyParty, click=True)
+  if(clickPos == None):
+    global selected_skill_pos
+    selected_skill_pos = None
+  return
+
+#endregion
 
 def renderNovelScene(character, dialogue_line):
   # start drawing
@@ -188,29 +288,30 @@ def renderNovelScene(character, dialogue_line):
   
   pygame.display.flip()  # Update the display to show changes
 
-def renderCombatScene(playerParty=None, enemyParty=None):
-  combatBGRender = pygame.transform.scale(combatBackGround, (x, y))
-  screen.blit(combatBGRender, (0, 0))  # Draw the background image
+def CombatSceneRender(playerParty=None, enemyParty=None):
+  # calculate all positions
+  CombatBGPos, leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions = CombatSpriteTransformCalculation()
+  # check & handle collisions
+  collisionPos = DetectCombatCollision(leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions, playerParty, enemyParty)
+  # render
   
-  offset = (100, 50)
-  leftPartyPositions = [(offset[0], center_y - sprite_size*3//4), (offset[0] + sprite_size, center_y - sprite_size*3//4), (offset[0] + sprite_size*2, center_y - sprite_size*3//4),
-                       (offset[0]*3//2, center_y + sprite_size*3//4), (offset[0]*3//2 + sprite_size, center_y + sprite_size*3//4) , (offset[0]*3//2 + sprite_size*2, center_y + sprite_size*3//4)]
-  rightPartyPositions = [(x - offset[0] - sprite_size, center_y - sprite_size*3//4), (x - offset[0] - sprite_size*2, center_y - sprite_size*3//4), (x - offset[0] - sprite_size*3, center_y - sprite_size*3//4),
-                         (x - offset[0]*3//2 - sprite_size, center_y + sprite_size*3//4), (x - offset[0]*3//2 - sprite_size*2, center_y + sprite_size*3//4), (x - offset[0]*3//2 - sprite_size*3, center_y + sprite_size*3//4)]
-
-  # keeping rep for later tests
-  # render as surfaces to show hp, speed etc.
-  rep = 0
-  for char in playerParty or []:
+  #Background
+  combatBGRender = pygame.transform.scale(combatBackGround, (x, y))
+  screen.blit(combatBGRender, CombatBGPos)  # Draw the background image
+  
+  #PlayerParty
+  for char in playerParty or []: # logic is flawed because 1 character is defined for now and I instantiate it 6 times
     sprite = findCharacterSprite(char)
-    for i in range(6): 
+    for rep in range(6): 
       # render positions
       CharacterPosition = leftPartyPositions[rep]
-      SkillsPosition = (leftPartyPositions[rep][0]+(sprite_size//2)-(skill_size//2), leftPartyPositions[rep][1]-(skill_size*2))
-      
+      # SkillsPosition = (leftPartyPositions[rep][0]+(sprite_size//2)-(skill_size//2), leftPartyPositions[rep][1]-(skill_size*2))
+      SkillsPosition = (leftPartyBaseSkillPositions[rep*2]) # position of the top skill is used for the surface that contains both.
+      SigSkillPosition = (leftPartySignatureSkillPositions[rep])
       # surface prep & collision
       characterSurface = RenderCharacterSurface(char, sprite)
-      skillSurface = BaseSkillSurface(char, SkillsPosition)
+      skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
+      sigSkillSurface = SignatureSkillSurface(char, SigSkillPosition, collisionPos)
       
       
 
@@ -218,14 +319,23 @@ def renderCombatScene(playerParty=None, enemyParty=None):
       screen.blit(characterSurface, CharacterPosition)
       # skill render
       screen.blit(skillSurface, SkillsPosition)
-      rep += 1
-  rep = 0
+      screen.blit(sigSkillSurface, SigSkillPosition) # signature skill next to base skill
+      
+  #EnemyParty
   for char in enemyParty or []:
     sprite = findCharacterSprite(char)
-    for i in range(6):
-      renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
-      screen.blit(renderSprite, rightPartyPositions[rep]) 
-      rep += 1
-    
+    for rep in range(6): # logic is flawed because 1 character is defined for now and I instantiate it 6 times
+      CharacterPosition = rightPartyPositions[rep]
+      SkillsPosition = (rightPartyBaseSkillPositions[rep*2]) # position of the top skill is used for the surface that contains both.
+      SigSkillPosition = (rightPartySignatureSkillPositions[rep])
+      # surface prep & collision
+      characterSurface = RenderCharacterSurface(char, sprite)
+      skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
+      sigSkillSurface = SignatureSkillSurface(char, SigSkillPosition, collisionPos)
+      # character render
+      screen.blit(characterSurface, CharacterPosition)
+      # skill render
+      screen.blit(skillSurface, SkillsPosition)
+      screen.blit(sigSkillSurface, SigSkillPosition) # signature skill next to base skill
   pygame.display.flip()  # Update the display to show changes
 #endregion

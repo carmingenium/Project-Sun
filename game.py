@@ -95,10 +95,11 @@ def initializeCharacters():
     speed=(3, 6),
     hp=100,
     base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
-    sig_skills=[],
+    sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
     supportSkills=[]
   )
   skillslist.append(player.base_skills[0])
+  skillslist.append(player.sig_skills[0])
   characterslist.append(player)
   
   unknown = character.Character(
@@ -106,8 +107,8 @@ def initializeCharacters():
     sprite='sprites/characters/unknown.png',
     speed=(3, 7),
     hp=100,
-    base_skills=[],
-    sig_skills=[],
+    base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', None)],
+    sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
     supportSkills=[]
   )
   characterslist.append(unknown)
@@ -138,7 +139,12 @@ def main():
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         running = False
-    renderer.renderCombatScene(playerParty, encounterParty)
+      if event.type == pygame.MOUSEBUTTONUP:
+        # on click, check for sprite collision
+        CombatBGPos, leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions = renderer.CombatSpriteTransformCalculation()
+        renderer.ClickEvent(leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions, playerParty, encounterParty)
+        continue
+    renderer.CombatSceneRender(playerParty, encounterParty)
     clock.tick(FPS)  # Limit to 60 frames per second
   return
 
