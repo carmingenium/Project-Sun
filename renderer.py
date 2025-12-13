@@ -19,12 +19,15 @@ renderposLeft = (100, 200)
 
 combatBackGround = pygame.image.load('sprites/backgrounds/combat_test.png').convert()
 
+leftPartyPositions = []
+rightPartyPositions = []
+
 # targeting variables
 selected_skill_pos = None
 targeted_skill_pos = None
 
+targeted_skills_position_list = []
 targeted_skills_list = []
-
 
 
 
@@ -55,6 +58,40 @@ def skillSpriteInitialize(skills):
 
 #endregion 
 
+
+def SetSkillTargeting(target_pair):
+  if(target_pair not in targeted_skills_position_list):
+    if(target_pair[0] == target_pair[1]):
+      return  # prevent targeting self
+    for pairs in targeted_skills_position_list:
+      if(pairs[0] == selected_skill_pos):
+        targeted_skills_position_list.remove(pairs) # remove previous targeting for same skill
+          
+    # set skill targeting depending on selected and targeted positions
+    skill = FindSkillByPosition(target_pair[0])
+    # find target as skill. character collision is not ready
+    target_skill = FindSkillByPosition(target_pair[1])
+    
+    targeted_skills_list.append((skill, target_skill)) # to be actualized at turn ends when they are implemented
+    targeted_skills_position_list.append(target_pair)
+  return
+
+def FindSkillByPosition(pos):
+  # find party depending on x coordinate
+  
+  # find position in party depending on coordinates
+  
+  # find skill depending on y coordinate
+  
+  # use skill
+  
+  return
+def FindCharacterByPosition(pos):
+  # find character depending on x coordinate
+  
+  # find position in party depending on coordinates
+  
+  return
 
 #region rendering functions
 
@@ -111,9 +148,9 @@ def DrawTargetingLine(start_pos, end_pos):
       current_distance += segment_length
 
 def DrawAllTargetedLines():
-  for skill_pair in targeted_skills_list:
-    start_pos = (skill_pair[0][0]+(skill_size//2), skill_pair[0][1]+(skill_size//2))
-    end_pos = (skill_pair[1][0]+(skill_size//2), skill_pair[1][1]+(skill_size//2))
+  for target_pair in targeted_skills_position_list: # when characters are added as targets, rewrite this part of the code
+    start_pos = (target_pair[0][0]+(skill_size//2), target_pair[0][1]+(skill_size//2))
+    end_pos = (target_pair[1][0]+(skill_size//2), target_pair[1][1]+(skill_size//2))
     DrawTargetingLine(start_pos, end_pos)
 
 def ResetCurrentTargeting():
@@ -126,6 +163,7 @@ def CombatSpriteTransformCalculation(): # calculate all positions
   offset = (100, 50)
   # region return values
   CombatBGPos = (0, 0)
+  global leftPartyPositions, rightPartyPositions
   
   leftPartyPositions = [(offset[0], center_y - sprite_size), (offset[0] + sprite_size, center_y - sprite_size), (offset[0] + sprite_size*2, center_y - sprite_size),
                        (offset[0]*3//2, center_y + sprite_size), (offset[0]*3//2 + sprite_size, center_y + sprite_size) , (offset[0]*3//2 + sprite_size*2, center_y + sprite_size)]
@@ -171,7 +209,7 @@ def RenderCharacterSurface(character, sprite):
   # text for stats
   sanity_text = font.render(f"{character.sanity}", True, (137, 207, 240))
   hp_text = font.render(f"{character.hp}", True, (238, 75, 43))
-  speed_text = font.render(f"{character.calculate_speed()}", True, (255, 255, 255)) # calculation will be moved to game.py when turn system is implemented.
+  speed_text = font.render(f"{character.speed}", True, (255, 255, 255)) # calculation will be moved to game.py when turn system is implemented.
   # space for stats
   sanity_space = pygame.Rect((sprite_size)*6/8, sprite_size, sprite_size/8, fontSize)
   hp_space= pygame.Rect((sprite_size)*3/8, sprite_size, sprite_size*2/8, fontSize) 
@@ -283,10 +321,11 @@ def DetectCombatCollision(leftPartyPositions=None, rightPartyPositions=None, lef
       if(click):
         return HandleSignatureSkillClick(pos, targeting)
       return (pos)
+
   if(targeting and click):
-    for skill_pair in targeted_skills_list: # if skill is already targeted, remove target
-      if(skill_pair[0] == selected_skill_pos):
-        targeted_skills_list.remove(skill_pair)
+    for target_pair in targeted_skills_position_list: # if skill is already targeted, remove target
+      if(target_pair[0] == selected_skill_pos):
+        targeted_skills_position_list.remove(target_pair)
     # clicked on empty space while targeting - reset selection
     ResetCurrentTargeting()
   return None
@@ -294,29 +333,32 @@ def DetectCombatCollision(leftPartyPositions=None, rightPartyPositions=None, lef
 def HandleBaseSkillClick(clickPos, targeting):
   # logic to handle base skill collision
   global selected_skill_pos, targeted_skill_pos
-  if(targeting):
-    targeted_skill_pos = clickPos
-    targeted_skills_list.append((selected_skill_pos,targeted_skill_pos))
-    ResetCurrentTargeting()
-    return targeted_skill_pos
-  else:
+  
+  # selecting first skill   
+  if(not targeting):
     selected_skill_pos = clickPos
     targeted_skill_pos = None
     return selected_skill_pos
+  else: # targeting with selected skill
+    targeted_skill_pos = clickPos
+    SetSkillTargeting((selected_skill_pos,targeted_skill_pos))
+    ResetCurrentTargeting()
+    return targeted_skill_pos
   return selected_skill_pos # failsafe
 
 def HandleSignatureSkillClick(clickPos, targeting):
   # logic to handle signature skill collision
   global selected_skill_pos, targeted_skill_pos
-  if(targeting):
-    targeted_skill_pos = clickPos
-    targeted_skills_list.append((selected_skill_pos,targeted_skill_pos))
-    ResetCurrentTargeting()
-    return targeted_skill_pos
-  else:
+  # selecting first skill   
+  if(not targeting):
     selected_skill_pos = clickPos
     targeted_skill_pos = None
     return selected_skill_pos
+  else: # targeting with selected skill
+    targeted_skill_pos = clickPos
+    SetSkillTargeting((selected_skill_pos,targeted_skill_pos))
+    ResetCurrentTargeting()
+    return targeted_skill_pos
   return selected_skill_pos # failsafe
 
 def ClickEvent(leftPartyPositions=None, rightPartyPositions=None, leftPartyBaseSkillPositions=None, leftPartySignatureSkillPositions=None, rightPartyBaseSkillPositions=None, rightPartySignatureSkillPositions=None, playerParty=None, enemyParty=None):
