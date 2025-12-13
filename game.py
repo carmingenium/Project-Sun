@@ -147,5 +147,5 @@ def main():
     renderer.CombatSceneRender(playerParty, encounterParty)
     clock.tick(FPS)  # Limit to 60 frames per second
   return
-
+  
 main()
