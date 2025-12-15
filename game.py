@@ -44,9 +44,6 @@ def initializeGame():
   
   # initialize characters
   initializeCharacters()
-  playerParty.append(characterslist[0]) # main character
-  encounterParty.append(characterslist[1]) # 'unknown' character
-  
   
 def initializeCharacters():
   #region charlist
@@ -89,40 +86,47 @@ def initializeCharacters():
   # Nukie Chemist (dps, healer, debuff)
   # Nukie Borg  (tank dps)
   #endregion
-  player = character.Character(
-    name="Blacked out Engineer",
-    sprite='sprites/characters/engineer.png',
-    speed=(3, 6),
-    hp=100,
-    base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
-    sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
-    supportSkills=[]
-  )
-  skillslist.append(player.base_skills[0])
-  skillslist.append(player.sig_skills[0])
-  characterslist.append(player)
+  # for testing purposes
+  for i in range(6):
+    player = character.Character(
+      name="Blacked out Engineer",
+      sprite='sprites/characters/engineer.png',
+      speed=(3, 6),
+      hp=100,
+      base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
+      sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
+      supportSkills=[]
+    )
+    skillslist.append(player.base_skills[0])
+    skillslist.append(player.sig_skills[0])
+    characterslist.append(player)
+    playerParty.append(player)
   
-  unknown = character.Character(
-    name="Unknown",
-    sprite='sprites/characters/unknown.png',
-    speed=(3, 7),
-    hp=100,
-    base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', None)],
-    sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
-    supportSkills=[]
-  )
-  characterslist.append(unknown)
+  for i in range(6):
+    unknown = character.Character(
+      name="Unknown",
+      sprite='sprites/characters/unknown.png',
+      speed=(3, 7),
+      hp=100,
+      base_skills=[character.Skill("Unknown Wrench", [], [], 15, 'sprites/skills/skill1.png', None)],
+      sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
+      supportSkills=[]
+    )
+    characterslist.append(unknown)
+    skillslist.append(unknown.base_skills[0])
+    skillslist.append(unknown.sig_skills[0])
+    encounterParty.append(unknown)
 
-  spacedragon = character.Character(
-    name="Space Dragon",
-    sprite='sprites/characters/spacedragon.png',
-    speed=(4, 8),
-    hp=150,
-    base_skills=[],
-    sig_skills=[],
-    supportSkills=[]
-  )
-  characterslist.append(spacedragon)
+  # spacedragon = character.Character(
+  #   name="Space Dragon",
+  #   sprite='sprites/characters/spacedragon.png',
+  #   speed=(4, 8),
+  #   hp=150,
+  #   base_skills=[],
+  #   sig_skills=[],
+  #   supportSkills=[]
+  # )
+  # characterslist.append(spacedragon)
 
 
 
@@ -133,7 +137,7 @@ def initializeCharacters():
 def main():
   initializeGame()
   running = True
-  # renderer.renderNovelScene(0, "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
+  # renderer.renderNovelScene(characterslist[0], "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
   # renderer.renderCombatScene(playerParty, encounterParty)
   while running:
     for event in pygame.event.get():

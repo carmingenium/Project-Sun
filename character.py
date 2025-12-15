@@ -86,7 +86,12 @@ class Character:
     self.supportSkills = supportSkills
 
     self.currentBaseSkills = [] # limit 2
+    # initialization here as a test, later in different function to repeat per turn
+    self.currentBaseSkills.append(self.base_skills[0])
+    self.currentBaseSkills.append(self.base_skills[0])
+    
     self.currentSigSkills = [] # depends on implementation, defense skill might always be here
+    self.currentSigSkills.append(self.sig_skills[0])
     
     self.available_targets = [] # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] # can only be from this set
 
