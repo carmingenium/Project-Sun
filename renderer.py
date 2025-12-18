@@ -523,7 +523,8 @@ def EndTurn():
   return
 #endregion
 
-# UI
+#region UI
 def WarnPlayer(errorReason="null"):
   # render a message on screen about given param
   return errorReason
+#endregion

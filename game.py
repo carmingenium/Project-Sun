@@ -48,43 +48,42 @@ def initializeGame():
 def initializeCharacters():
   #region charlist
 
-  # player: drunk engineer
-  # head of sec
-  # sec off
-  # assistant
-  # clown
-  # mime
-  # Borg (default ~ can transform)
-  # unknown
+  # player: drunk engineer sprite done
+  # head of sec sprite done
+  # sec off sprite done 
+  # clown sprite done 
+  # mime sprite done 
+  # Borg (default ~ can transform (tranform delayed)) sprite ready not imported
+  # unknown sprite done
 
 
-  # encounter 1
-  # X amount space carps
+  # encounter 1 - hallway - sprite not ready
+  # X amount space carps | sprite ready not imported
 
 
-  # encounter 2
-  # X amount zombies
+  # encounter 2 - hallway
+  # X amount zombies | sprite not found, might get removed
 
 
-  # encounter 3
-  # Changeling
-  # Traitor
+  # encounter 3 - behind fire alarms & in front of engineering department - sprite not ready
+  # Changeling | 2 sprites needed - ready not imported
+  # Traitor | sprite done
 
 
-  # encounter 4
-  # Moon Heretic (alternative ending)
+  # encounter 4  - inside engineering department - sprite not ready
+  # Moon Heretic (alternative ending) - sprite ready not imported
 
-  # encounter 5 (boss fight)
+  # encounter 5 (boss fight) - supermatter engine room - sprite not ready
   # 3 way fight (3 endings)
 
   # Party 1
-  # Space Dragon
+  # Space Dragon - sprite ready (might add new sprite for new forms etc.)
 
-  # Party 2
-  # Nukie Gunner (dps, cc)
-  # Nukie Engineer (summoner, heals borg)
-  # Nukie Chemist (dps, healer, debuff)
-  # Nukie Borg  (tank dps)
+  # Party 2 
+  # Nukie Gunner (dps, cc) - sprite not ready
+  # Nukie Engineer (summoner, heals borg) - sprite not ready 
+  # Nukie Chemist (dps, healer, debuff) - sprite not ready 
+  # Nukie Borg  (tank dps) sprite ready not imported
   #endregion
   # for testing purposes
   for i in range(6):
