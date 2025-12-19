@@ -190,7 +190,6 @@ def DrawAllTargetedLines():
     end_pos = (target_pair[1][0]+(skill_size//2), target_pair[1][1]+(skill_size//2))
     DrawTargetingLine(start_pos, end_pos)
 
-
 def CombatSpriteTransformCalculation(): # calculate all positions
   offset = (100, 50)
   # region return values
@@ -228,6 +227,27 @@ def CombatSpriteTransformCalculation(): # calculate all positions
     
   
   return CombatBGPos, leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions
+
+def CombatDescriptiveSurfaceRender():
+  # render descriptive surfaces for combat - to be implemented
+  descriptiveText = pygame.Surface((1920,400), pygame.SRCALPHA)
+  descriptiveText.fill((0, 0, 30, 150))  # semi-transparent black
+
+  font = pygame.font.Font(None, 32)   # None = default font, 32 = size
+  # top left = skill image enlarged
+  # on the right = coin amount and coin power
+  # under and continuing to the right = skill description
+  # maybe per coin explanation
+  return
+
+def SupportSkillsRender():
+  # render support skills - to be implemented
+  supportSurface = pygame.Surface((200,1080), pygame.SRCALPHA)
+  supportSurface.fill((0, 0, 30, 150))  # semi-transparent black
+
+  # condition for glowy filter
+  # render all support skills, filter depending on condition fulfilled
+
 #endregion
 
 #region Rendering

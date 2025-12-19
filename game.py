@@ -92,8 +92,10 @@ def initializeCharacters():
       sprite='sprites/characters/engineer.png',
       speed=(3, 6),
       hp=100,
-      base_skills=[character.Skill("Engineer Wrench", [], [], 15, 'sprites/skills/skill1.png', character.engineer_wrench_skill)],
-      sig_skills=[character.Skill("Overclocked Repair", [], [], 25, 'sprites/skills/evade.png', None)],
+      base_skills=[character.Skill("Clink Clank", 2, 4, 10, 'sprites/skills/skill1.png', character.engineer_wrench_skill),
+                   character.Skill("GET WELDED", 3, 3, 5, 'sprites/skills/skill2.png', None)    ],
+      sig_skills=[character.Skill("Ray Emitter", 4, 4, 8, 'sprites/skills/evade.png', None),
+                  character.Skill("We need to build a wall", 1, 0, 16, 'sprites/skills/def.png', None)   ],
       supportSkills=[]
     )
     skillslist.append(player.base_skills[0])
