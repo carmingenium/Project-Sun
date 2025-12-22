@@ -53,27 +53,23 @@ def initializeCharacters():
   # sec off sprite done 
   # clown sprite done 
   # mime sprite done 
-  # Borg (default ~ can transform (tranform delayed)) sprite ready not imported
+  # Borg sprite ready
   # unknown sprite done
 
 
-  # encounter 1 - hallway - sprite not ready
-  # X amount space carps | sprite ready not imported
+  # encounter 1 - bg ready
+  # X amount space carps | sprite ready
 
 
-  # encounter 2 - hallway
-  # X amount zombies | sprite not found, might get removed
+  # encounter 2 - bg ready
+  # Changeling | ready
+  # Traitor | sprite ready
 
 
-  # encounter 3 - behind fire alarms & in front of engineering department - sprite not ready
-  # Changeling | 2 sprites needed - ready not imported
-  # Traitor | sprite done
+  # encounter 3  - bg ready
+  # Moon Heretic (alternative ending) - ready
 
-
-  # encounter 4  - inside engineering department - sprite not ready
-  # Moon Heretic (alternative ending) - sprite ready not imported
-
-  # encounter 5 (boss fight) - supermatter engine room - sprite not ready
+  # encounter 4 (boss fight) - bg ready
   # 3 way fight (3 endings)
 
   # Party 1
@@ -83,8 +79,9 @@ def initializeCharacters():
   # Nukie Gunner (dps, cc) - sprite not ready
   # Nukie Engineer (summoner, heals borg) - sprite not ready 
   # Nukie Chemist (dps, healer, debuff) - sprite not ready 
-  # Nukie Borg  (tank dps) sprite ready not imported
+  # Nukie Borg  (tank dps) sprite ready
   #endregion
+  
   # for testing purposes
   for i in range(6):
     player = character.Character(
@@ -92,10 +89,10 @@ def initializeCharacters():
       sprite='sprites/characters/engineer.png',
       speed=(3, 6),
       hp=100,
-      base_skills=[character.Skill("Clink Clank", 2, 4, 10, 'sprites/skills/skill1.png', character.engineer_wrench_skill),
-                   character.Skill("GET WELDED", 3, 3, 5, 'sprites/skills/skill2.png', None)    ],
-      sig_skills=[character.Skill("Ray Emitter", 4, 4, 8, 'sprites/skills/evade.png', None),
-                  character.Skill("We need to build a wall", 1, 0, 16, 'sprites/skills/def.png', None)   ],
+      base_skills=[character.Skill("Clink Clank", 2, 4, 10, 'sprites/skills/skill1.png', character.engineer_wrench_skill, ["enemy", "characters"]),
+                   character.Skill("GET WELDED", 3, 3, 5, 'sprites/skills/skill2.png', None, ["all", "characters"])    ],
+      sig_skills=[character.Skill("Ray Emitter", 4, 4, 8, 'sprites/skills/evade.png', None, ["enemy", "characters"]),
+                  character.Skill("We need to build a wall", 1, 0, 16, 'sprites/skills/def.png', None, ["enemy", "characters"])   ],
       supportSkills=[]
     )
     skillslist.append(player.base_skills[0])
@@ -118,6 +115,9 @@ def initializeCharacters():
     skillslist.append(unknown.sig_skills[0])
     encounterParty.append(unknown)
 
+
+
+  # final encounter
   # spacedragon = character.Character(
   #   name="Space Dragon",
   #   sprite='sprites/characters/spacedragon.png',

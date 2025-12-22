@@ -59,7 +59,7 @@ class Character:
     self.currentSigSkills = [] # depends on implementation, defense skill might always be here
     self.currentSigSkills.append(self.sig_skills[0])
     
-    self.available_targets = [] # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] # can only be from this set
+    self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] # can only be from this set
 
   # def add_skill(self, skill_name, level):
   #   new_skill = Skill.Skill(skill_name, level)
