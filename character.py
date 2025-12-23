@@ -3,13 +3,15 @@ import random
 #region Skill
 
 class Skill:
-  def __init__(self, name, coinamount, coinpower, damage, sprite, implementation):
+  def __init__(self, name, coinamount, coinpower, damage, sprite, implementation, available_targets=[("enemy", "skills")]):
     self.name = name
     self.coinamount = coinamount
     self.coinpower = coinpower
     self.damage = damage
     self.implementation = implementation
     self.sprite = sprite
+    
+    self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] ("all") for both categories
     # animation (stop motion, so sprite list here for coins to select from maybe)
 
   def __repr__(self):
@@ -40,7 +42,7 @@ def engineer_wrench_skill(user, target):
 
 
 class Character:
-  def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[], available_targets=[("enemy", "skills")]):
+  def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[]):
     self.name = name
     self.sprite = sprite
     self.speedRange = speed
@@ -58,8 +60,6 @@ class Character:
     
     self.currentSigSkills = [] # depends on implementation, defense skill might always be here
     self.currentSigSkills.append(self.sig_skills[0])
-    
-    self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] # can only be from this set
 
   # def add_skill(self, skill_name, level):
   #   new_skill = Skill.Skill(skill_name, level)

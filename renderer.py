@@ -31,6 +31,7 @@ rightPartyPositions = []
 # temporary variables
 selected_skill_pos = None
 targeted_skill_pos = None
+targeted_character_pos = None
 
 targeted_skills_position_list = []
 targeted_skills_list = []
@@ -68,28 +69,49 @@ def skillSpriteInitialize(skills):
 
 #region Skill association
 def ResetCurrentTargeting():
-  global selected_skill_pos, targeted_skill_pos
+  global selected_skill_pos, targeted_skill_pos, targeted_character_pos
   selected_skill_pos = None
   targeted_skill_pos = None
+  targeted_character_pos = None
   return
 
 def SetSkillTargeting(target_pair):
   global targeted_skills_position_list, targeted_skills_list
-  if(target_pair not in targeted_skills_position_list):
-    if(target_pair[0] == target_pair[1]):
-      return  # prevent targeting self
-    for pairs in targeted_skills_position_list:
-      if(pairs[0] == selected_skill_pos):
-        targeted_skills_position_list.remove(pairs) # remove previous targeting for same skill
-          
-    # set skill targeting depending on selected and targeted positions
-    skill = FindSkillByPosition(target_pair[0])
-    # find target as skill. character collision is not ready
-    target_skill = FindSkillByPosition(target_pair[1])
-    
-    targeted_skills_list.append((skill, target_skill)) # to be actualized at turn ends when they are implemented
-    targeted_skills_position_list.append(target_pair)
+  if(target_pair[0] == target_pair[1]): # prevent targeting self
+    return  
+  if(target_pair in targeted_skills_position_list): # targeted before, return
+    return
+  targeting_char = FindCharacterBySkill(target_pair[0])
+  targeted_char, targeted_object = None, None
+  
+  # target is character or skill
+  if(target_pair[1] is type(character.Skill)): # skill
+    targeted_char = FindCharacterBySkill(target_pair[1])
+    targeted_object = "skill"
+  elif(target_pair[1] is type(character.Character)): # character
+    targeted_char = (target_pair[1])
+    targeted_object = "character"
+  
+  targeting_party = FindPartyFromCharacter(targeting_char)
+  targeted_party = FindPartyFromCharacter(targeted_char)
+  
+  # prevent targeting invalid target types
+  if(not (target_pair[0].available_targets[0] == targeted_party and target_pair[0].available_targets[1] == targeted_object)): # target invalid
+    return
+  
+  for pairs in targeted_skills_position_list:
+    if(pairs[0] == selected_skill_pos):
+      targeted_skills_position_list.remove(pairs) # remove previous targeting for same skill
+        
+  # set skill targeting depending on selected and targeted positions
+  skill = FindSkillByPosition(target_pair[0])
+  # find target as skill. character collision is not ready
+  target_skill = FindSkillByPosition(target_pair[1])
+  
+  targeted_skills_list.append((skill, target_skill)) # to be actualized at turn ends when they are implemented
+  targeted_skills_position_list.append(target_pair)
   return
+
 def FindSkillByPosition(pos):
   # find party depending on x coordinate
   
@@ -131,6 +153,18 @@ def FindCharacterByPosition(pos):
       char = charParty[index]
       return char
   return None
+def FindCharacterBySkill(skill):
+  for char in leftPartyChars + rightPartyChars:
+    if(skill in char.currentBaseSkills or skill in char.currentSignatureSkills):
+      return char
+  return None
+def FindPartyFromCharacter(character):
+  if(character in leftPartyChars):
+    return "player"
+  elif(character in rightPartyChars):
+    return "enemy"
+  return None
+
 #endregion
 
 #region Rendering support functions
@@ -251,10 +285,17 @@ def SupportSkillsRender():
 #endregion
 
 #region Rendering
-def RenderCharacterSurface(character, sprite):
+def RenderCharacterSurface(character, sprite, characterPos, collisionPos):
   fontSize = 32
   renderSprite = pygame.transform.scale(sprite, (sprite_size, sprite_size))
   charSurface = pygame.Surface((sprite_size, sprite_size+fontSize), pygame.SRCALPHA) 
+  
+  # collision hover
+  charRect = pygame.Rect(characterPos[0], characterPos[1], sprite_size, sprite_size)
+  if charRect.collidepoint(collisionPos or (0,0)):
+    highlight = pygame.Surface((sprite_size, sprite_size), pygame.SRCALPHA)
+    highlight.fill((255, 255, 255, 120)) # semi-transparent white
+    charSurface.blit(highlight, (0,0))
   charSurface.blit(renderSprite, (0,0)) # character sprite render
   font = pygame.font.Font(None, fontSize)
   
@@ -381,7 +422,7 @@ def CombatSceneRender(playerParty=None, enemyParty=None):
     SkillsPosition = (leftPartyBaseSkillPositions[index*2]) # position of the top skill is used for the surface that contains both.
     SigSkillPosition = (leftPartySignatureSkillPositions[index])
     # surface prep & collision
-    characterSurface = RenderCharacterSurface(char, sprite)
+    characterSurface = RenderCharacterSurface(char, sprite, CharacterPosition, collisionPos)
     skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
     sigSkillSurface = SignatureSkillSurface(char, SigSkillPosition, collisionPos)
     
@@ -400,7 +441,7 @@ def CombatSceneRender(playerParty=None, enemyParty=None):
     SkillsPosition = (rightPartyBaseSkillPositions[index*2]) # position of the top skill is used for the surface that contains both.
     SigSkillPosition = (rightPartySignatureSkillPositions[index])
     # surface prep & collision
-    characterSurface = RenderCharacterSurface(char, sprite)
+    characterSurface = RenderCharacterSurface(char, sprite, CharacterPosition, collisionPos)
     skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
     sigSkillSurface = SignatureSkillSurface(char, SigSkillPosition, collisionPos)
     
@@ -446,14 +487,18 @@ def DetectCombatCollision(leftPartyPositions=None, rightPartyPositions=None, lef
     return HandleTurnEndClick()
   
   # currently no character interaction - commented
-    # for pos in leftPartyPositions or []:
-    #   rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
-    #   if rect.collidepoint(mouse_pos):
-    #     pass
-    # for pos in rightPartyPositions or []:
-    #   rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
-    #   if rect.collidepoint(mouse_pos):
-    #     pass
+  for pos in leftPartyPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleCharacterClick(pos, targeting)
+      return (pos)
+  for pos in rightPartyPositions or []:
+    rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
+    if rect.collidepoint(mouse_pos):
+      if(click):
+        return HandleCharacterClick(pos, targeting)
+      return (pos)
   
   for pos in leftPartyBaseSkillPositions or []:
     rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size)
@@ -489,6 +534,19 @@ def DetectCombatCollision(leftPartyPositions=None, rightPartyPositions=None, lef
     ResetCurrentTargeting()
   return None
 
+def HandleCharacterClick(clickPos, targeting):
+  # logic to handle character collision
+  global selected_skill_pos, targeted_character_pos
+  
+  if(not targeting):
+    # later added
+    return
+  else:
+    targeted_character_pos = clickPos
+    SetSkillTargeting((selected_skill_pos,targeted_character_pos))
+    ResetCurrentTargeting()
+    return targeted_character_pos
+  return
 def HandleBaseSkillClick(clickPos, targeting):
   # logic to handle base skill collision
   global selected_skill_pos, targeted_skill_pos
@@ -504,7 +562,6 @@ def HandleBaseSkillClick(clickPos, targeting):
     ResetCurrentTargeting()
     return targeted_skill_pos
   return selected_skill_pos # failsafe
-
 def HandleSignatureSkillClick(clickPos, targeting):
   # logic to handle signature skill collision
   global selected_skill_pos, targeted_skill_pos
@@ -519,7 +576,6 @@ def HandleSignatureSkillClick(clickPos, targeting):
     ResetCurrentTargeting()
     return targeted_skill_pos
   return selected_skill_pos # failsafe
-
 def HandleTurnEndClick():
   if(CalculateTurnEndPrerequisites()):
     EndTurn()

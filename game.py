@@ -22,6 +22,7 @@ dialogueList = []
 
 #endregion
 
+#region initialization
 def initializeGame():
   
   # loading all story files - reserved for later
@@ -134,6 +135,8 @@ def initializeCharacters():
   renderer.spriteListInitialize(characterslist)
   renderer.skillSpriteInitialize(skillslist)
   return
+#endregion
+
 
 def main():
   initializeGame()
