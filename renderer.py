@@ -75,40 +75,38 @@ def ResetCurrentTargeting():
   targeted_character_pos = None
   return
 
-def SetSkillTargeting(target_pair):
+def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   global targeted_skills_position_list, targeted_skills_list
   if(target_pair[0] == target_pair[1]): # prevent targeting self
     return  
   if(target_pair in targeted_skills_position_list): # targeted before, return
     return
-  targeting_char = FindCharacterBySkill(target_pair[0])
-  targeted_char, targeted_object = None, None
+  targeting_skill = FindSkillByPosition(target_pair[0])
+  targeting_char = FindCharacterBySkill(targeting_skill)
+    
+  targeted_object = FindSkillByPosition(target_pair[1]) or FindCharacterByPosition(target_pair[1])
+
   
   # target is character or skill
-  if(target_pair[1] is type(character.Skill)): # skill
-    targeted_char = FindCharacterBySkill(target_pair[1])
-    targeted_object = "skill"
-  elif(target_pair[1] is type(character.Character)): # character
-    targeted_char = (target_pair[1])
-    targeted_object = "character"
+  if(isinstance(targeted_object, character.Skill)): # skill
+    targeted_char = FindCharacterBySkill(targeted_object)
+    targeted_object_type = "skill"
+  elif(isinstance(targeted_object, character.Character)): # character
+    targeted_char = targeted_object
+    targeted_object_type = "character"
   
   targeting_party = FindPartyFromCharacter(targeting_char)
   targeted_party = FindPartyFromCharacter(targeted_char)
   
   # prevent targeting invalid target types
-  if(not (target_pair[0].available_targets[0] == targeted_party and target_pair[0].available_targets[1] == targeted_object)): # target invalid
+  if(not (targeting_skill.available_targets[0] == targeted_party and targeting_skill.available_targets[1] == targeted_object_type)): # target invalid
     return
   
   for pairs in targeted_skills_position_list:
     if(pairs[0] == selected_skill_pos):
       targeted_skills_position_list.remove(pairs) # remove previous targeting for same skill
-        
-  # set skill targeting depending on selected and targeted positions
-  skill = FindSkillByPosition(target_pair[0])
-  # find target as skill. character collision is not ready
-  target_skill = FindSkillByPosition(target_pair[1])
   
-  targeted_skills_list.append((skill, target_skill)) # to be actualized at turn ends when they are implemented
+  targeted_skills_list.append((targeting_skill, targeted_object)) # to be actualized at turn ends when they are implemented
   targeted_skills_position_list.append(target_pair)
   return
 
@@ -155,7 +153,7 @@ def FindCharacterByPosition(pos):
   return None
 def FindCharacterBySkill(skill):
   for char in leftPartyChars + rightPartyChars:
-    if(skill in char.currentBaseSkills or skill in char.currentSignatureSkills):
+    if(skill in char.currentBaseSkills or skill in char.currentSigSkills):
       return char
   return None
 def FindPartyFromCharacter(character):

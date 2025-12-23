@@ -87,7 +87,7 @@ def initializeCharacters():
   for i in range(6):
     player = character.Character(
       name="Blacked out Engineer",
-      sprite='sprites/characters/engineer.png',
+      sprite='sprites/characters/player/engineer.png',
       speed=(3, 6),
       hp=100,
       base_skills=[character.Skill("Clink Clank", 2, 4, 10, 'sprites/skills/skill1.png', character.engineer_wrench_skill, ["enemy", "characters"]),
@@ -104,7 +104,7 @@ def initializeCharacters():
   for i in range(6):
     unknown = character.Character(
       name="Unknown",
-      sprite='sprites/characters/unknown.png',
+      sprite='sprites/characters/player/unknown.png',
       speed=(3, 7),
       hp=100,
       base_skills=[character.Skill("Unknown Wrench", [], [], 15, 'sprites/skills/skill1.png', None)],
