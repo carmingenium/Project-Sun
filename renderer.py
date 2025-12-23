@@ -330,8 +330,10 @@ def BaseSkillSurface(character, globalPosition, collisionPos=None):
   rect2 = pygame.Rect(globalPosition[0], globalPosition[1]+skill_size, skill_size, skill_size)
   rects.append(rect2)
   
-  skillSprite = findSkillSprite(character.base_skills[0]) 
-  renderSkillSprite = pygame.transform.scale(skillSprite, (skill_size, skill_size))
+  skillSprite1 = findSkillSprite(character.base_skills[0]) 
+  renderSkillSprite1 = pygame.transform.scale(skillSprite1, (skill_size, skill_size))
+  skillSprite2 = findSkillSprite(character.base_skills[1])
+  renderSkillSprite2 = pygame.transform.scale(skillSprite2, (skill_size, skill_size))
   
   for rect in rects:
     if(selected_skill_pos == (rect.x, rect.y)):
@@ -342,26 +344,41 @@ def BaseSkillSurface(character, globalPosition, collisionPos=None):
       highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
       highlight.fill((255, 255, 255, 120)) # semi-transparent white
       skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
-    skillSurface.blit(renderSkillSprite, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
+    if(rect.y == globalPosition[1]):
+      skillSurface.blit(renderSkillSprite1, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    else: 
+      skillSurface.blit(renderSkillSprite2, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
   return skillSurface
 
 def SignatureSkillSurface(character, globalPosition, collisionPos=None):
   # game.py needs to calculate skills that will be shown here later
   skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
   
-  rect = pygame.Rect(globalPosition[0], globalPosition[1], 32, 64)
+  # Skill Grouping
+  rects = []
+  rect1 = pygame.Rect(globalPosition[0], globalPosition[1], skill_size, skill_size)
+  rects.append(rect1)
+  rect2 = pygame.Rect(globalPosition[0], globalPosition[1]+skill_size, skill_size, skill_size)
+  rects.append(rect2)
   
-  skillSprite = findSkillSprite(character.sig_skills[0]) 
-  renderSkillSprite = pygame.transform.scale(skillSprite, (32, 64))
-  if(selected_skill_pos == (rect.x, rect.y)):
-    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-    highlight.fill((255, 255, 255, 255)) # white background
-    skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
-  elif rect.collidepoint(collisionPos or (0,0)):
-    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-    highlight.fill((255, 255, 255, 120)) # semi-transparent white
-    skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
-  skillSurface.blit(renderSkillSprite, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
+  skillSprite1 = findSkillSprite(character.sig_skills[0]) 
+  renderSkillSprite1 = pygame.transform.scale(skillSprite1, (skill_size, skill_size))
+  skillSprite2 = findSkillSprite(character.sig_skills[1])
+  renderSkillSprite2 = pygame.transform.scale(skillSprite2, (skill_size, skill_size))
+  
+  for rect in rects:
+    if(selected_skill_pos == (rect.x, rect.y)):
+      highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+      highlight.fill((255, 255, 255, 255)) # white background
+      skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    elif rect.collidepoint(collisionPos or (0,0)):
+      highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+      highlight.fill((255, 255, 255, 120)) # semi-transparent white
+      skillSurface.blit(highlight, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    if(rect.y == globalPosition[1]):
+      skillSurface.blit(renderSkillSprite1, (rect.x - globalPosition[0], rect.y - globalPosition[1]))
+    else: 
+      skillSurface.blit(renderSkillSprite2, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
   return skillSurface
 
 def renderNovelScene(character, dialogue_line):
