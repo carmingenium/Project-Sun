@@ -16,7 +16,12 @@ spriteslist = []
 
 # party
 playerParty = []
+encounters = []
 encounterParty = []
+encounterParty1 = []
+encounterParty2 = []
+encounterParty3 = []
+encounterParty4 = []
 # dialogues
 dialogueList = []
 
@@ -57,7 +62,7 @@ def characterSetup(character, party):
   return
  
 def initializeCharacters():
-
+  global playerParty, encounterParty1, encounterParty2, encounterParty3, encounterParty4, characterslist, skillslist, encounters
   #region PLAYER AVAILABLE CHARACTERS
   player = character.Character(
     name="Blacked out Engineer",
@@ -203,7 +208,6 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(carp3, encounterParty1)
-  
   carp4 = character.Character(
     name="Green Space Carp",
     sprite='sprites/characters/encounter/encounter1/carp_green_west.png',
@@ -216,7 +220,14 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(carp4, encounterParty1)
-  
+  encounter1 = renderer.Encounter(
+    name="Encounter1",
+    encounterPartyCharacters=encounterParty1,
+    encounterPartyPositions=[(1400, 400), (1600, 400), (1400, 600), (1600, 600)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
+    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    combatBGimage='sprites/backgrounds/encounter_1.png'
+  )
   #endregion
   
   #region ENCOUNTER 2
@@ -224,7 +235,7 @@ def initializeCharacters():
   encounterParty2 = []
   changeling = character.Character(
     name="Changeling",
-    sprite='sprites/characters/encounter/encounter2/changeling.png', # has 4 sprites, handled later with skills or during novel to combat process
+    sprite='sprites/characters/encounter/encounter2/changeling_base.png', # has 4 sprites, handled later with skills or during novel to combat process
     speed=(4, 7),
     hp=110,
     base_skills=[character.Skill("Shapeshift Strike", 3, 4, 15, 'sprites/skills/skill1.png', None, ["player", "characters"]),
@@ -234,7 +245,6 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(changeling, encounterParty2)
-  
   traitor = character.Character(
     name="Traitor",
     sprite='sprites/characters/encounter/encounter2/traitor.png', #sprite not ready
@@ -247,6 +257,14 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(traitor, encounterParty2) # NEED TO REMOVE UNKNOWN FROM PLAYER PARTY
+  encounter2 = renderer.Encounter(
+    name="Encounter2",
+    encounterPartyCharacters=encounterParty2,
+    encounterPartyPositions=[(1400, 400), (1600, 400)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
+    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    combatBGimage='sprites/backgrounds/encounter_2.png'
+  )
   #endregion
   
   #region ENCOUNTER 3
@@ -254,7 +272,7 @@ def initializeCharacters():
   encounterParty3 = []
   heretic = character.Character(
     name="Moon Heretic",
-    sprite='sprites/characters/encounter/encounter3/moonheretic.png',
+    sprite='sprites/characters/encounter/encounter3/heretic_battle.png',
     speed=(4, 7),
     hp=120,
     base_skills=[character.Skill("Lunar Strike", 3, 4, 18, 'sprites/skills/skill1.png', None, ["player", "characters"]),
@@ -264,6 +282,14 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(heretic, encounterParty3)
+  encounter3 = renderer.Encounter(
+    name="Encounter3",
+    encounterPartyCharacters=encounterParty3,
+    encounterPartyPositions=[(1400, 800)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
+    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    combatBGimage='sprites/backgrounds/encounter_3.png'
+  )
   #endregion
   
   #region ENCOUNTER 4
@@ -271,7 +297,7 @@ def initializeCharacters():
   encounterParty4 = []
   spacedragon = character.Character(
     name="Space Dragon",
-    sprite='sprites/characters/spacedragon.png',
+    sprite='sprites/characters/encounter/encounter4/spacedragon.png',
     speed=(4, 8),
     hp=150,
     base_skills=[character.Skill("Cosmic Breath", 4, 5, 20, 'sprites/skills/skill1.png', None, ["player", "characters"]),
@@ -281,14 +307,25 @@ def initializeCharacters():
     supportSkills=[]
   )
   characterSetup(spacedragon, encounterParty4)
+  encounter4 = renderer.Encounter(
+    name="Encounter4",
+    encounterPartyCharacters=encounterParty4,
+    encounterPartyPositions=[(1400, 800)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
+    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    combatBGimage='sprites/backgrounds/encounter_4.png'
+  )
   # nukies
   
   #endregion
 
-  renderer.spriteListInitialize(characterslist)
+  encounters = [encounter1, encounter2, encounter3, encounter4]
+  renderer.spriteListInitialize(characterslist, encounters)
   renderer.skillSpriteInitialize(skillslist)
   return
 #endregion
+
+
 
 
 def main():
@@ -296,16 +333,32 @@ def main():
   running = True
   # renderer.renderNovelScene(characterslist[0], "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
   # renderer.renderCombatScene(playerParty, encounterParty)
+  renderer.initializePlayerCharacters(playerParty)
+  encounterDefaultPlayerParty = [playerParty[0], playerParty[1], playerParty[2], playerParty[3]]
+  
+  encounterDefault = renderer.Encounter(
+    name="Encounter1",
+    encounterPartyCharacters=encounterParty1,
+    encounterPartyPositions=[(1400, 400), (1600, 400), (1400, 800), (1600, 800)],
+    playerPartyCharacters=encounterDefaultPlayerParty, 
+    playerPartyPositions=[(200, 400), (400, 400), (200, 800), (400, 800)],
+    combatBGimage='sprites/backgrounds/encounter_1.png'
+  )
+  
+  
   while running:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         running = False
       if event.type == pygame.MOUSEBUTTONUP:
         # on click, check for sprite collision
-        CombatBGPos, leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions = renderer.CombatSpriteTransformCalculation()
-        renderer.ClickEvent(leftPartyPositions, rightPartyPositions, leftPartyBaseSkillPositions, leftPartySignatureSkillPositions, rightPartyBaseSkillPositions, rightPartySignatureSkillPositions, playerParty, encounterParty)
+        partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounterDefault)
+        renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounterParty)
+        # renderer.GetMousePos()
+        # renderer.ClickEvent("partyselect")
         continue
-    renderer.CombatSceneRender(playerParty, encounterParty)
+    renderer.CombatSceneRender(encounterDefault)
+    # renderer.RenderPartySelecter(playerParty)
     clock.tick(FPS)  # Limit to 60 frames per second
   return
   
