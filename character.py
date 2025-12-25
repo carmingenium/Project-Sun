@@ -21,7 +21,9 @@ class Skill:
     # chance = user.sp + 50
     # random coinflip with 'chance' for every coin
     return
-
+  def ExecuteSkill(self, target):
+    self.implementation(target) # could have user?
+    return
 
 #region Skill Functions
 

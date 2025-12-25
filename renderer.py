@@ -130,10 +130,10 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   # target is character or skill
   if(isinstance(targeted_object, character.Skill)): # skill
     targeted_char = FindCharacterBySkill(targeted_object)
-    targeted_object_type = "skill"
+    targeted_object_type = "skills"
   elif(isinstance(targeted_object, character.Character)): # character
     targeted_char = targeted_object
-    targeted_object_type = "character"
+    targeted_object_type = "characters"
   
   targeting_party = FindPartyFromCharacter(targeting_char)
   targeted_party = FindPartyFromCharacter(targeted_char)
@@ -148,6 +148,9 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   
   targeted_skills_list.append((targeting_skill, targeted_object)) # to be actualized at turn ends when they are implemented
   targeted_skills_position_list.append(target_pair)
+  
+  
+  
   return
 
 def FindSkillByPosition(pos):
@@ -265,9 +268,12 @@ def DrawTargetingLine(start_pos, end_pos):
       # Move to next segment
       current_distance += segment_length
 def DrawAllTargetedLines():
-  for target_pair in targeted_skills_position_list: # when characters are added as targets, rewrite this part of the code NOT DONE YET!!!!
+  for target_pair in targeted_skills_position_list:
     start_pos = (target_pair[0][0]+(skill_size//2), target_pair[0][1]+(skill_size//2))
-    end_pos = (target_pair[1][0]+(skill_size//2), target_pair[1][1]+(skill_size//2))
+    if(target_pair[1] in enemyPartyPositions or target_pair[1] in playerPartyPositions):
+      end_pos = (target_pair[1][0]+(sprite_size//2), target_pair[1][1]+(sprite_size//2))
+    else:
+      end_pos = (target_pair[1][0]+(skill_size//2), target_pair[1][1]+(skill_size//2))
     DrawTargetingLine(start_pos, end_pos)
 
 def CombatSpriteTransformCalculation(encounter): # calculate all positions
@@ -738,11 +744,15 @@ def HandleTurnEndClick():
 def CalculateTurnEndPrerequisites():
   skill = None
   if(skill in skillList not in targeted_skills_list): # enemy skills need to be appointed in a guaranteed running function
+    # also not all skills need to be targeted (1 per column)
     return False
   return True
 def EndTurn():
   # execute all targeted skills
-
+  for target_pair in targeted_skills_list:
+    skill = target_pair[0]
+    target = target_pair[1]
+    skill.ExecuteSkill(target)
   # reset for next turn
   targeted_skills_list.clear()
   targeted_skills_position_list.clear()
