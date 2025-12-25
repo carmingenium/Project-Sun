@@ -115,6 +115,15 @@ def ResetCurrentTargeting():
   targeted_character_pos = None
   return
 
+def HasCharacterUsedSkillType(character, skill_type):
+  for pair in targeted_skills_list:
+    sk = pair[0]
+    if skill_type == "base" and sk in character.base_skills:
+      return True
+    if skill_type == "sig" and sk in character.sig_skills:
+      return True
+  return False
+
 def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   global targeted_skills_position_list, targeted_skills_list
   if(target_pair[0] == target_pair[1]): # prevent targeting self
@@ -123,6 +132,7 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
     return
   targeting_skill = FindSkillByPosition(target_pair[0])
   targeting_char = FindCharacterBySkill(targeting_skill)
+  skill_type = targeting_skill in targeting_char.base_skills and "base" or targeting_skill in targeting_char.sig_skills and "sig" or None
     
   targeted_object = FindSkillByPosition(target_pair[1]) or FindCharacterByPosition(target_pair[1])
 
@@ -142,15 +152,18 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   if(not (targeting_skill.available_targets[0] == targeted_party and targeting_skill.available_targets[1] == targeted_object_type)): # target invalid
     return
   
-  for pairs in targeted_skills_position_list:
-    if(pairs[0] == selected_skill_pos):
-      targeted_skills_position_list.remove(pairs) # remove previous targeting for same skill
-  
+  if(HasCharacterUsedSkillType(targeting_char, skill_type)): # already used skill of this type
+    # find old targeting
+    for target_pair in targeted_skills_position_list:
+      if(target_pair[0] in targeting_char.base_skills or target_pair[0] in targeting_char.sig_skills): # found old targeting 
+        # remove
+        targeted_skills_position_list.remove(target_pair)
+        targeted_skills_list.remove((FindSkillByPosition(target_pair[0]), FindSkillByPosition(target_pair[1]) or FindCharacterByPosition(target_pair[1])))  
+        break
+      
   targeted_skills_list.append((targeting_skill, targeted_object)) # to be actualized at turn ends when they are implemented
   targeted_skills_position_list.append(target_pair)
-  
-  
-  
+
   return
 
 def FindSkillByPosition(pos):
@@ -174,13 +187,13 @@ def FindSkillByPosition(pos):
       sigSkillPos_2 = (charPos[0]+(sprite_size//2)+(skill_size//2), charPos[1]-(skill_size*2)+skill_size)
       
       if pos == baseSkill_1_Pos:
-        return char.currentBaseSkills[0]
+        return char.base_skills[0]
       elif pos == baseSkill_2_Pos:
-        return char.currentBaseSkills[1]
+        return char.base_skills[1]
       elif pos == sigSkillPos:
-        return char.currentSigSkills[0]
+        return char.sig_skills[0]
       elif pos == sigSkillPos_2:
-        return char.currentSigSkills[1]
+        return char.sig_skills[1]
   return None
 def FindCharacterByPosition(pos):
   if(pos[0] < center_x):
@@ -199,7 +212,7 @@ def FindCharacterByPosition(pos):
   return None
 def FindCharacterBySkill(skill):
   for char in leftPartyChars + rightPartyChars:
-    if(skill in char.currentBaseSkills or skill in char.currentSigSkills):
+    if(skill in char.base_skills or skill in char.sig_skills):
       return char
   return None
 def FindPartyFromCharacter(character):
@@ -743,9 +756,14 @@ def HandleTurnEndClick():
 #region turn system
 def CalculateTurnEndPrerequisites():
   skill = None
-  if(skill in skillList not in targeted_skills_list): # enemy skills need to be appointed in a guaranteed running function
-    # also not all skills need to be targeted (1 per column)
-    return False
+  for skill in skillList: # enemy skills need to be appointed in a guaranteed running function
+    if(skill not in targeted_skills_list):
+      # check if character used another skill in the same type
+      user = FindCharacterBySkill(skill)
+      skill_type = skill in user.base_skills and "base" or skill in user.sig_skills and "sig" or None
+      if(HasCharacterUsedSkillType(user, skill_type)):
+        continue
+      return False
   return True
 def EndTurn():
   # execute all targeted skills
