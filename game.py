@@ -72,8 +72,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Clink Clank", 2, 4, 10, 'sprites/skills/skill1.png', character.engineer_wrench_skill, ["enemy", "characters"]),
                   character.Skill("GET WELDED", 3, 3, 5, 'sprites/skills/skill2.png', None, ["all", "characters"])    ],
     sig_skills=[character.Skill("Ray Emitter", 4, 4, 8, 'sprites/skills/evade.png', None, ["enemy", "characters"]),
-                character.Skill("We need to build a wall", 1, 0, 16, 'sprites/skills/def.png', None, ["enemy", "skills"])   ],
-    supportSkills=[]
+                character.Skill("We need to build a wall", 1, 0, 16, 'sprites/skills/def.png', None, ["enemy", "skills"])   ]
   )
   characterSetup(player, playerParty)
   
@@ -85,8 +84,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Toolbox", 2, 4, 10, 'sprites/skills/skill1.png', None, ["enemy", "characters"]),
                  character.Skill("Mysterious Syringe", 3, 3, 15, 'sprites/skills/skill2.png', None, ["all", "characters"])],
     sig_skills=[character.Skill("Suspicious Attack", 4, 4, 25, 'sprites/skills/evade.png', None, ["enemy", "characters"]),
-                character.Skill("Stolen Shield", 3, 5, 20, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                character.Skill("Stolen Shield", 3, 5, 20, 'sprites/skills/def.png', None, ["enemy", "skills"])]
   )
   characterSetup(unknown, playerParty)
   
@@ -98,8 +96,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Taser Shot", 2, 4, 12, 'sprites/skills/skill1.png', None, ["enemy", "characters"]),
                  character.Skill("Shield Bash", 3, 3, 14, 'sprites/skills/skill2.png', None, ["enemy", "characters"])],
     sig_skills=[character.Skill("Shotgun Unload", 3, 6, 20, 'sprites/skills/evade.png', None, ["enemy", "characters"]),
-                character.Skill("Fortify Position", 4, 4, 18, 'sprites/skills/def.png', None, ["player", "characters"])],
-    supportSkills=[]
+                character.Skill("Fortify Position", 4, 4, 18, 'sprites/skills/def.png', None, ["player", "characters"])]
+    
   )
   characterSetup(hos, playerParty)
   
@@ -111,8 +109,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Baton Strike", 2, 4, 10, 'sprites/skills/skill1.png', None , ["enemy", "characters"]),
                  character.Skill("Pepper Spray", 3, 3, 12, 'sprites/skills/skill2.png', None, ["enemy", "characters"])],
     sig_skills=[character.Skill("Call Backup", 4, 4, 18, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Expect Attack", 2, 5, 15, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                character.Skill("Expect Attack", 2, 5, 15, 'sprites/skills/def.png', None, ["enemy", "skills"])]
+    
   )
   characterSetup(secoff, playerParty)
   
@@ -124,8 +122,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Pie Throw", 2, 4, 14, 'sprites/skills/skill1.png', None, ["all", "characters"]),
                  character.Skill("Vicious Mockery", 3, 3, 16, 'sprites/skills/skill2.png', None, ["all", "characters"])],
     sig_skills=[character.Skill("Laughing Gas", 4, 4, 22, 'sprites/skills/evade.png', None, ["all", "characters"]),
-                character.Skill("Lie Down", 2, 5, 19, 'sprites/skills/def.png', None, ["player", "skills"])], # does not need to be targetable, could add a 'click only' category
-    supportSkills=[]
+                character.Skill("Lie Down", 2, 5, 19, 'sprites/skills/def.png', None, ["player", "skills"])] # does not need to be targetable, could add a 'click only' category
+    
   )
   characterSetup(clown, playerParty)
   
@@ -137,8 +135,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Banana Slip", 2, 4, 13, 'sprites/skills/skill1.png', None, ["enemy", "characters"]),
                  character.Skill("Silent Mockery", 3, 3, 17, 'sprites/skills/skill2.png', None, ["enemy", "characters"])],
     sig_skills=[character.Skill("Silent Strike", 4, 4, 21, 'sprites/skills/evade.png', None, ["enemy", "characters"]),
-                character.Skill("Invisible Wall", 2, 4, 13, 'sprites/skills/skill1.png', None, ["all", "characters"])],
-    supportSkills=[]
+                character.Skill("Invisible Wall", 2, 4, 13, 'sprites/skills/skill1.png', None, ["all", "characters"])]
   )
   characterSetup(mime, playerParty) 
   
@@ -151,8 +148,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Medibeam", 2, 4, 15, 'sprites/skills/skill1.png', None, ["player", "characters"]),    
                  character.Skill("Hypospray", 3, 3, 18, 'sprites/skills/skill2.png', None, ["player", "characters"])],
     sig_skills=[character.Skill("Nanite Swarm", 4, 4, 23, 'sprites/skills/evade.png', None, ["player", "characters"])
-                ,character.Skill("Reinforced Plating", 2, 5, 20, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                ,character.Skill("Reinforced Plating", 2, 5, 20, 'sprites/skills/def.png', None, ["enemy", "skills"])]
   )
   characterSetup(borg, playerParty)
   
@@ -164,8 +160,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Hypospray", 2, 4, 12, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("First Aid", 3, 3, 15, 'sprites/skills/skill2.png', None, ["player", "characters"])],    
     sig_skills=[character.Skill("Adrenaline Boost", 4, 4, 20, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Electroshock", 2, 5, 18, 'sprites/skills/def.png', None, ["player", "skills"])],
-    supportSkills=[]
+                character.Skill("Electroshock", 2, 5, 18, 'sprites/skills/def.png', None, ["player", "skills"])]
+    
   )
   characterSetup(felinid, playerParty)
   #endregion
@@ -180,8 +176,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Splash Attack", 1, 3, 8, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Prepare", 2, 2, 10, 'sprites/skills/skill2.png', None, ["enemy", "characters"])], # on-click category
     sig_skills=[character.Skill("Fin Swipe", 2, 4, 12, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])],
-    supportSkills=[]
+                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])]
+    
   )
   characterSetup(carp1, encounterParty1)
   carp2 = character.Character(
@@ -192,8 +188,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Splash Attack", 1, 3, 8, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Prepare", 2, 2, 10, 'sprites/skills/skill2.png', None, ["enemy", "characters"])], # on-click category
     sig_skills=[character.Skill("Fin Swipe", 2, 4, 12, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])],
-    supportSkills=[]
+                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])]
+    
   )
   characterSetup(carp2, encounterParty1)
   carp3 = character.Character(
@@ -204,8 +200,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Splash Attack", 1, 3, 8, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Prepare", 2, 2, 10, 'sprites/skills/skill2.png', None, ["enemy", "characters"])], # on-click category
     sig_skills=[character.Skill("Fin Swipe", 2, 4, 12, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])],
-    supportSkills=[]
+                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])]
+    
   )
   characterSetup(carp3, encounterParty1)
   carp4 = character.Character(
@@ -216,8 +212,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Splash Attack", 1, 3, 8, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Prepare", 2, 2, 10, 'sprites/skills/skill2.png', None, ["enemy", "characters"])], # on-click category
     sig_skills=[character.Skill("Fin Swipe", 2, 4, 12, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])],
-    supportSkills=[]
+                character.Skill("Evasive Teleport", 1, 5, 14, 'sprites/skills/def.png', None, ["player", "skills"])]
+    
   )
   characterSetup(carp4, encounterParty1)
   encounter1 = renderer.Encounter(
@@ -241,8 +237,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Shapeshift Strike", 3, 4, 15, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Mimicry", 2, 3, 12, 'sprites/skills/skill2.png', None, ["enemy", "characters"])],
     sig_skills=[character.Skill("Adaptive Defense", 4, 5, 20, 'sprites/skills/evade.png', None, ["enemy", "skills"]),
-                character.Skill("Regeneration", 3, 4, 18, 'sprites/skills/def.png', None, ["enemy", "characters"])],
-    supportSkills=[]
+                character.Skill("Regeneration", 3, 4, 18, 'sprites/skills/def.png', None, ["enemy", "characters"])]
+    
   )
   characterSetup(changeling, encounterParty2)
   traitor = character.Character(
@@ -253,8 +249,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Backstab", 3, 4, 14, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Sabotage", 2, 3, 16, 'sprites/skills/skill2.png', None, ["enemy", "skills"])],
     sig_skills=[character.Skill("Poisoned Blade", 4, 5, 22, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Vanish", 3, 4, 19, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                character.Skill("Vanish", 3, 4, 19, 'sprites/skills/def.png', None, ["enemy", "skills"])]
+    
   )
   characterSetup(traitor, encounterParty2) # NEED TO REMOVE UNKNOWN FROM PLAYER PARTY
   encounter2 = renderer.Encounter(
@@ -278,8 +274,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Lunar Strike", 3, 4, 18, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Gravity Well", 2, 3, 15, 'sprites/skills/skill2.png', None, ["enemy", "characters"])],
     sig_skills=[character.Skill("Lunacy", 4, 5, 25, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Eclipse Shield", 3, 4, 22, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                character.Skill("Eclipse Shield", 3, 4, 22, 'sprites/skills/def.png', None, ["enemy", "skills"])]
+    
   )
   characterSetup(heretic, encounterParty3)
   encounter3 = renderer.Encounter(
@@ -303,8 +299,8 @@ def initializeCharacters():
     base_skills=[character.Skill("Cosmic Breath", 4, 5, 20, 'sprites/skills/skill1.png', None, ["player", "characters"]),
                  character.Skill("Tail Swipe", 3, 4, 18, 'sprites/skills/skill2.png', None, ["player", "characters"])],
     sig_skills=[character.Skill("Starfall", 5, 6, 30, 'sprites/skills/evade.png', None, ["player", "characters"]),
-                character.Skill("Galactic Roar", 4, 5, 25, 'sprites/skills/def.png', None, ["enemy", "skills"])],
-    supportSkills=[]
+                character.Skill("Galactic Roar", 4, 5, 25, 'sprites/skills/def.png', None, ["enemy", "skills"])]
+    
   )
   characterSetup(spacedragon, encounterParty4)
   encounter4 = renderer.Encounter(

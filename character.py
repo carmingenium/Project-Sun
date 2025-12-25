@@ -44,7 +44,7 @@ def engineer_wrench_skill(user, target):
 
 
 class Character:
-  def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[], supportSkills=[]):
+  def __init__(self, name, sprite, speed, hp, base_skills=[], sig_skills=[]):
     self.name = name
     self.sprite = sprite
     self.speedRange = speed
