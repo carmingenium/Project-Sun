@@ -124,6 +124,7 @@ def HasCharacterUsedSkillType(character, skill_type):
       return True
   return False
 
+
 def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   global targeted_skills_position_list, targeted_skills_list
   if(target_pair[0] == target_pair[1]): # prevent targeting self
@@ -149,16 +150,16 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   targeted_party = FindPartyFromCharacter(targeted_char)
   
   # prevent targeting invalid target types
-  if(not (targeting_skill.available_targets[0] == targeted_party and targeting_skill.available_targets[1] == targeted_object_type)): # target invalid
+  if( not ((targeting_skill.available_targets[0] == targeted_party  or targeting_skill.available_targets[0] == "all") and (targeting_skill.available_targets[1] == targeted_object_type)) ): # target invalid
     return
   
   if(HasCharacterUsedSkillType(targeting_char, skill_type)): # already used skill of this type
     # find old targeting
-    for target_pair in targeted_skills_position_list:
-      if(target_pair[0] in targeting_char.base_skills or target_pair[0] in targeting_char.sig_skills): # found old targeting 
+    for new_pair in targeted_skills_position_list:
+      if(new_pair[0][0] == target_pair[0][0]): # found old targeting 
         # remove
-        targeted_skills_position_list.remove(target_pair)
-        targeted_skills_list.remove((FindSkillByPosition(target_pair[0]), FindSkillByPosition(target_pair[1]) or FindCharacterByPosition(target_pair[1])))  
+        targeted_skills_position_list.remove(new_pair)
+        targeted_skills_list.remove((FindSkillByPosition(new_pair[0]), FindSkillByPosition(new_pair[1]) or FindCharacterByPosition(new_pair[1])))  
         break
       
   targeted_skills_list.append((targeting_skill, targeted_object)) # to be actualized at turn ends when they are implemented
@@ -206,7 +207,7 @@ def FindCharacterByPosition(pos):
   # find position in party depending on coordinates
   for charPos in party:
     index = party.index(charPos)
-    if charPos[0] == party[index][0]: # found character position
+    if pos == charPos: # found character position
       char = charParty[index]
       return char
   return None
