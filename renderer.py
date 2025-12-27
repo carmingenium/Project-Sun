@@ -31,12 +31,24 @@ skill_size = 32 # per skill
 renderposRight = (1400, 200)
 renderposLeft = (100, 200)
 
+
+game_state = "partyselect" # "partyselect", "novel", "combat"
+
+
+# Backgrounds and UI Buttons
 barBG = pygame.image.load('sprites/backgrounds/characterselect.png').convert()
 combatBackGround = pygame.image.load('sprites/backgrounds/combat_test.png').convert()
 
-turnEndButtonSprite = pygame.image.load('sprites/ui/winrate.png').convert_alpha()
-turnEndButton = pygame.Rect(x - 200, y - 100, 180, 80) # position and size of the button
-turnEndButtonSprite = pygame.transform.scale(turnEndButtonSprite, (turnEndButton.width, turnEndButton.height))
+
+turnEndReadyButtonSprite = pygame.image.load('sprites/ui/turn_end_button_ready.png').convert_alpha()
+turnEndBlockedButtonSprite = pygame.image.load('sprites/ui/turn_end_button_blocked.png').convert_alpha()
+characterSetupButtonSprite = pygame.image.load('sprites/ui/character_setup_button.png').convert_alpha()
+turnEndReadyButton = pygame.Rect(x - 200, y - 100, 200, 60) # position and size of the button
+turnEndBlockedButton = pygame.Rect(x - 200, y - 100, 200, 60) # position and size of the button
+characterSetupButton = pygame.Rect(x - 400, y - 100, 200, 60) # position and size of the button
+turnEndReadyButtonSprite = pygame.transform.scale(turnEndReadyButtonSprite, (turnEndReadyButton.width, turnEndReadyButton.height))
+turnEndBlockedButtonSprite = pygame.transform.scale(turnEndBlockedButtonSprite, (turnEndBlockedButton.width, turnEndBlockedButton.height))
+characterSetupButtonSprite = pygame.transform.scale(characterSetupButtonSprite, (characterSetupButton.width, characterSetupButton.height))
 
 # variables
 playerPartyPositions = []
@@ -688,7 +700,7 @@ def CombatSceneRender(encounter=type(Encounter)):
   combatBGRender = pygame.transform.scale(combatBGRender, (x, y))
   screen.blit(combatBGRender, (0, 0))  # Draw the background image
   # constant UI
-  screen.blit(turnEndButtonSprite, (turnEndButton.x, turnEndButton.y)) 
+  screen.blit(turnEndBlockedButtonSprite, (turnEndBlockedButton.x, turnEndBlockedButton.y)) 
   
   #PlayerParty
   for char in playerParty or []:
@@ -751,8 +763,9 @@ def RenderPartySelecter(availableCharacters):
   # character amount = 8 to 7
   characterPositions = barCharacterPositions.copy()
   # collider
-  collisionPos = DetectCollision(characterPositions)
+  collisionPos = DetectPartySelectCollision(characterPositions)
   
+    
   
   # draw characters
   for char in availableCharacters or []:
@@ -773,10 +786,9 @@ def RenderPartySelecter(availableCharacters):
     # character render
     screen.blit(characterSurface, charPos)
   # draw finalize party button
-  
+  screen.blit(characterSetupButtonSprite, (characterSetupButton.x, characterSetupButton.y))
   # Update the display to show what was drawn
   pygame.display.flip()
-  
   return
 #endregion
 
@@ -786,7 +798,9 @@ def ClickEvent(state, partyPositions=None, skillPositions=None, playerParty=None
   if(state == "combat"):
     clickPos = DetectCombatCollision(partyPositions, skillPositions, playerParty, enemyParty, click=True)
   elif(state == "partyselect"):
-    clickPos = DetectCollision(barCharacterPositions, click=True)
+    clickPos = DetectPartySelectCollision(barCharacterPositions, click=True)
+    if(selectedPartyCharacters.count(None) == 0):
+      return selectedPartyCharacters
   elif(state == "novel"):
     return 
   else:
@@ -806,7 +820,7 @@ def DetectCombatCollision(partyPositions=None, skillPositions=None, playerParty=
   
   # define rects for all characters & skills
   
-  if(turnEndButton.collidepoint(mouse_pos) and click):
+  if(turnEndReadyButton.collidepoint(mouse_pos) and click): # button rects are the same 
     return HandleTurnEndClick()
   
   # currently no character interaction - commented
@@ -857,7 +871,7 @@ def DetectCombatCollision(partyPositions=None, skillPositions=None, playerParty=
     ResetCurrentTargeting()
   return None
 
-def DetectCollision(posList, click = False):
+def DetectPartySelectCollision(posList, click = False):
   mouse_pos = pygame.mouse.get_pos()
   for pos in posList:
     rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
@@ -865,6 +879,9 @@ def DetectCollision(posList, click = False):
       if(click):
         HandleCharacterSelect(mouse_pos)
       return pos
+  if(characterSetupButton.collidepoint(pygame.mouse.get_pos()) and click): # if selection is being finalized
+    if(selectedPartyCharacters.count(None) == 0):
+      HandleSelectionEnd()
   return None
 
 def HandleCharacterSelect(clickPos):
@@ -886,6 +903,12 @@ def HandleCharacterSelect(clickPos):
             selectedPartyCharacters[i] = char
             benchedPartyCharacters.remove(char)
             return
+  return
+def HandleSelectionEnd():
+  global playerPartyChars
+  playerPartyChars = selectedPartyCharacters.copy()
+  # proceed to next game state
+  AdvanceGameState("combat")
   return
 def HandleCharacterClick(clickPos, targeting):
   # logic to handle character collision
@@ -937,7 +960,13 @@ def HandleTurnEndClick():
   return
 #endregion
 
-#region turn system
+#region turn system & game state
+def AdvanceGameState(given_state):
+  global game_state
+  game_state = given_state
+  return
+
+
 def CalculateTurnEndPrerequisites():
   skill = None
   for skill in skillList: # enemy skills need to be appointed in a guaranteed running function

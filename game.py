@@ -9,12 +9,17 @@ FPS = 60
 
 
 #region Variables
-skillslist = []
-# list of all encounters & characters
+
+
+gamestate = "" # "partyselect", "novel" or "combat"
+
+# object lists
 characterslist = []
 spriteslist = []
+skillslist = []
 
 # party
+currentParty = []
 playerParty = []
 encounters = []
 encounterParty = []
@@ -341,17 +346,29 @@ def main():
   
   
   while running:
+    gamestate = renderer.game_state
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         running = False
       if event.type == pygame.MOUSEBUTTONUP:
         # on click, check for sprite collision
-        partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounterDefault)
-        renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounterParty)
+        if(gamestate == "partyselect"):
+          selectedCharacters = renderer.ClickEvent("partyselect", [], [], playerParty, [])
+          if(selectedCharacters != None):
+            currentParty = selectedCharacters
+        if(gamestate == "combat"):
+          partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounterDefault)
+          renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounterParty)
         # renderer.GetMousePos()
         # renderer.ClickEvent("partyselect")
         continue
-    renderer.CombatSceneRender(encounterDefault)
+    if gamestate == "combat":
+      encounterDefault.playerPartyCharacters = currentParty
+      renderer.CombatSceneRender(encounterDefault)
+    elif gamestate == "partyselect":
+      renderer.RenderPartySelecter(playerParty)
+    elif gamestate == "novel":
+      renderer.NovelSceneRender()
     # renderer.RenderPartySelecter(playerParty)
     clock.tick(FPS)  # Limit to 60 frames per second
   return
