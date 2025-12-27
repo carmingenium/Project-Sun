@@ -3,41 +3,223 @@ import random
 #region Skill
 
 class Skill:
-  def __init__(self, name, coinamount, coinpower, damage, sprite, implementation, available_targets=[("enemy", "skills")]):
+  def __init__(self, name, damage, sprite, implementation, description = f"Deals X damage.", available_targets=[("enemy", "skills")]):
     self.name = name
-    self.coinamount = coinamount
-    self.coinpower = coinpower
     self.damage = damage
     self.implementation = implementation
+    self.description = description
     self.sprite = sprite
     
-    self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] ("all") for both categories
+    self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] ("all") for both categories, ("click") for no targets?
     # animation (stop motion, so sprite list here for coins to select from maybe)
 
   def __repr__(self):
-    return f"Skill(name={self.name}, coinamount={self.amount}, coinpower={self.coinpower}, damage={self.damage})"
+    return f"Skill(name={self.name}, description={self.description}, damage={self.damage})"
 
-  def use(self, user, target, effectslist):
+  def use(self, user, target):
     # chance = user.sp + 50
-    # random coinflip with 'chance' for every coin
-    return
-  def ExecuteSkill(self, target):
-    self.implementation(target) # could have user?
+    # self.implementation(self, target) 
     return
 
 #region Skill Functions
-
-def engineer_wrench_skill(user, target):
-  target.take_damage(15) #get dmg from skill object
+#region Player Skills
+#region Engineer
+def engineer_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
+  return
+def engineer_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 
-
-# list_of_funcs = [character.func1, character.func2, character.func3]
-# for func in list_of_funcs:
-#     func(param1, param2)
+def engineer_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
+  return
+def engineer_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
+  return
+#endregion
+#region Unknown
+def unknown_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def unknown_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def unknown_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def unknown_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Head of Security
+def hos_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def hos_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def hos_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def hos_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Security Officer
+def secoff_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def secoff_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def secoff_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def secoff_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Clown
+def clown_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def clown_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def clown_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def clown_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Mime
+def mime_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def mime_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def mime_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def mime_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Borg
+def borg_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def borg_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def borg_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def borg_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Medic
+def medic_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def medic_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def medic_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def medic_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
 
 #endregion
 
+#region Encounter1
+#region Carps
+def carp_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def carp_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def carp_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def carp_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#endregion
+
+#region Encounter2
+#region Changeling #hopefully form changing.
+def changeling_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def changeling_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def changeling_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def changeling_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#region Traitor
+def traitor_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def traitor_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def traitor_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def traitor_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#endregion
+
+#region Encounter3
+#region Heretic
+def heretic_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def heretic_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def heretic_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def heretic_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#endregion
+
+#region Encounter4
+#region Dragon
+def dragon_baseskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def dragon_baseskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def dragon_sigskill1(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+def dragon_sigskill2(user, target):
+  target.take_damage(user.damage) #get dmg from skill object
+  return
+#endregion
+#endregion
 
 #endregion
 
