@@ -1,6 +1,7 @@
 import pygame
 import character
 import math
+import random
 
 #region Encounter Class
 class Encounter:
@@ -49,8 +50,8 @@ targeted_character_pos = None
 targeted_skills_position_list = []
 targeted_skills_list = []
 
-rightPartyChars = []
-leftPartyChars = []
+enemyPartyChars = []
+playerPartyChars = []
 
 # party select variables
 select_x_offset = 34
@@ -114,17 +115,6 @@ def ResetCurrentTargeting():
   targeted_skill_pos = None
   targeted_character_pos = None
   return
-
-def HasCharacterUsedSkillType(character, skill_type):
-  for pair in targeted_skills_list:
-    sk = pair[0]
-    if skill_type == "base" and sk in character.base_skills:
-      return True
-    if skill_type == "sig" and sk in character.sig_skills:
-      return True
-  return False
-
-
 def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   global targeted_skills_position_list, targeted_skills_list
   if(target_pair[0] == target_pair[1]): # prevent targeting self
@@ -166,16 +156,95 @@ def SetSkillTargeting(target_pair): # target pair is two tuples of positions
   targeted_skills_position_list.append(target_pair)
 
   return
+def EnemySkillTargeting(): 
+  # random target selection:
+  # for every enemy skill type (1 for base 1 for signature), select a target once
+  
+  for enemy in enemyPartyChars:
+    # base skill
+    skillSelection = random.randint(0, 1) # base skill index
+    skill = enemy.base_skills[skillSelection]
+    valid_targets = []
+    if(skill.available_targets[1] == "characters"):
+      if(skill.available_targets[0] == "player"):
+        target_party = playerPartyChars
+      elif(skill.available_targets[0] == "enemy"):
+        target_party = enemyPartyChars
+      elif(skill.available_targets[0] == "all"):
+        target_party = playerPartyChars + enemyPartyChars
+      valid_targets = target_party
+    
+    elif(skill.available_targets[1] == "skills"):
+      if(skill.available_targets[0] == "player"):
+        target_party = playerPartyChars
+      elif(skill.available_targets[0] == "enemy"):
+        target_party = enemyPartyChars
+      elif(skill.available_targets[0] == "all"):
+        target_party = playerPartyChars + enemyPartyChars
+      elif(skill.available_targets[0] == "click"):
+        target_party = [enemy] # self-targeting skills for now
+        return # later added
+      valid_targets = []
+      for target_char in target_party:
+        for target_skill in target_char.base_skills + target_char.sig_skills:
+          valid_targets.append(target_skill)
+    if(len(valid_targets) == 0):
+      continue
+    target = random.choice(valid_targets)
+    targeted_skills_list.append((skill, target))
+    targeted_skills_position_list.append( (FindPositionFromSkill(skill), FindPositionFromSkill(target) or FindPositionFromCharacter(target)) )
+    
+    
+    
+    # signature skill
+    skillSelection = random.randint(0, 1) # sig skill index
+    skill = enemy.sig_skills[skillSelection]
+    valid_targets = []
+    if(skill.available_targets[1] == "characters"):
+      if(skill.available_targets[0] == "player"):
+        target_party = playerPartyChars
+      elif(skill.available_targets[0] == "enemy"):
+        target_party = enemyPartyChars
+      elif(skill.available_targets[0] == "all"):
+        target_party = playerPartyChars + enemyPartyChars
+      valid_targets = target_party
+    
+    elif(skill.available_targets[1] == "skills"):
+      if(skill.available_targets[0] == "player"):
+        target_party = playerPartyChars
+      elif(skill.available_targets[0] == "enemy"):
+        target_party = enemyPartyChars
+      elif(skill.available_targets[0] == "all"):
+        target_party = playerPartyChars + enemyPartyChars
+      elif(skill.available_targets[0] == "click"):
+        target_party = [enemy] # self-targeting skills for now
+        return # later added
+      valid_targets = []
+      for target_char in target_party:
+        for target_skill in target_char.base_skills + target_char.sig_skills:
+          valid_targets.append(target_skill)
+  
+  return
+
+def HasCharacterUsedSkillType(character, skill_type):
+  for pair in targeted_skills_list:
+    sk = pair[0]
+    if skill_type == "base" and sk in character.base_skills:
+      return True
+    if skill_type == "sig" and sk in character.sig_skills:
+      return True
+  return False
+
 
 def FindSkillByPosition(pos):
   # find party depending on x coordinate
   
   if(pos[0] < center_x):
     party = playerPartyPositions
-    charParty = leftPartyChars
+    charParty = playerPartyChars
   else:
     party = enemyPartyPositions 
-    charParty = rightPartyChars
+    charParty = enemyPartyChars
   
   # find position in party depending on coordinates
   for charPos in party:
@@ -199,10 +268,10 @@ def FindSkillByPosition(pos):
 def FindCharacterByPosition(pos):
   if(pos[0] < center_x):
     party = playerPartyPositions
-    charParty = leftPartyChars
+    charParty = playerPartyChars
   else:
     party = enemyPartyPositions 
-    charParty = rightPartyChars
+    charParty = enemyPartyChars
   
   # find position in party depending on coordinates
   for charPos in party:
@@ -212,17 +281,36 @@ def FindCharacterByPosition(pos):
       return char
   return None
 def FindCharacterBySkill(skill):
-  for char in leftPartyChars + rightPartyChars:
+  for char in playerPartyChars + enemyPartyChars:
     if(skill in char.base_skills or skill in char.sig_skills):
       return char
   return None
 def FindPartyFromCharacter(character):
-  if(character in leftPartyChars):
+  if(character in playerPartyChars):
     return "player"
-  elif(character in rightPartyChars):
+  elif(character in enemyPartyChars):
     return "enemy"
   return None
-
+def FindPositionFromCharacter(character):
+  if(character in playerPartyChars):
+    index = playerPartyChars.index(character)
+    return playerPartyPositions[index]
+  elif(character in enemyPartyChars):
+    index = enemyPartyChars.index(character)
+    return enemyPartyPositions[index]
+  return None
+def FindPositionFromSkill(skill):
+  char = FindCharacterBySkill(skill)
+  charPos = FindPositionFromCharacter(char)
+  if skill in char.base_skills:
+    skillIndex = char.base_skills.index(skill)
+    skillPos = (charPos[0]+(sprite_size//2)-(skill_size//2), charPos[1]-(skill_size*2)+ (skill_size * skillIndex))
+    return skillPos
+  elif skill in char.sig_skills:
+    skillIndex = char.sig_skills.index(skill)
+    skillPos = (charPos[0]+(sprite_size//2)+(skill_size//2), charPos[1]-(skill_size*2)+ (skill_size * skillIndex))
+    return skillPos
+  return None
 #endregion
 
 #region Rendering support functions
@@ -247,6 +335,108 @@ def findSkillSprite(skill):
       index = skillList.index(sk)
       return skill_sprites[index]
 
+def HighlightValidTargets(skill):
+  # highlight valid targets for given skill in green, non-valid targets in red.
+  targets = skill.available_targets[0] # "player", "enemy", "all", "click"
+  if targets == "click":
+    # highlight user
+    return
+  elif (targets == "player"):
+    valid_party = playerPartyPositions
+    invalid_party = enemyPartyPositions
+  elif (targets == "enemy"):
+    valid_party = enemyPartyPositions
+    invalid_party = playerPartyPositions
+  elif (targets == "all"):
+    valid_party = playerPartyPositions + enemyPartyPositions
+    invalid_party = []
+  
+  targets = skill.available_targets[1] # "characters", "skills"
+  
+  final_validation = []
+  final_invalids = []
+  if(targets == "characters"):
+    for pos in valid_party: # character pos
+      baseSkill_1_Pos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+      baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+      sigSkillPos_2 = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      
+      base1rect = pygame.rect.Rect(baseSkill_1_Pos[0], baseSkill_1_Pos[1], skill_size, skill_size)
+      base2rect = pygame.rect.Rect(baseSkill_2_Pos[0], baseSkill_2_Pos[1], skill_size, skill_size)
+      sig1rect = pygame.rect.Rect(sigSkillPos[0], sigSkillPos[1], skill_size, skill_size)
+      sig2rect = pygame.rect.Rect(sigSkillPos_2[0], sigSkillPos_2[1], skill_size, skill_size)
+      charRect = pygame.rect.Rect(pos[0], pos[1], sprite_size, sprite_size)
+      
+      final_invalids.append(base1rect)
+      final_invalids.append(base2rect)
+      final_invalids.append(sig1rect)
+      final_invalids.append(sig2rect)
+      final_validation.append(charRect)
+    for pos in invalid_party:
+      baseSkill_1_Pos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+      baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+      sigSkillPos_2 = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      
+      base1rect = pygame.rect.Rect(baseSkill_1_Pos[0], baseSkill_1_Pos[1], skill_size, skill_size)
+      base2rect = pygame.rect.Rect(baseSkill_2_Pos[0], baseSkill_2_Pos[1], skill_size, skill_size)
+      sig1rect = pygame.rect.Rect(sigSkillPos[0], sigSkillPos[1], skill_size, skill_size)
+      sig2rect = pygame.rect.Rect(sigSkillPos_2[0], sigSkillPos_2[1], skill_size, skill_size)
+      charRect = pygame.rect.Rect(pos[0], pos[1], sprite_size, sprite_size)
+      
+      final_invalids.append(base1rect)
+      final_invalids.append(base2rect)
+      final_invalids.append(sig1rect)
+      final_invalids.append(sig2rect)
+      final_invalids.append(charRect)
+  elif(targets == "skills"):
+    for pos in valid_party:
+      baseSkill_1_Pos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+      baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+      sigSkillPos_2 = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      
+      base1rect = pygame.rect.Rect(baseSkill_1_Pos[0], baseSkill_1_Pos[1], skill_size, skill_size)
+      base2rect = pygame.rect.Rect(baseSkill_2_Pos[0], baseSkill_2_Pos[1], skill_size, skill_size)
+      sig1rect = pygame.rect.Rect(sigSkillPos[0], sigSkillPos[1], skill_size, skill_size)
+      sig2rect = pygame.rect.Rect(sigSkillPos_2[0], sigSkillPos_2[1], skill_size, skill_size)
+      charRect = pygame.rect.Rect(pos[0], pos[1], sprite_size, sprite_size)
+      
+      
+      final_validation.append(base1rect)
+      final_validation.append(base2rect)
+      final_validation.append(sig1rect)
+      final_validation.append(sig2rect)
+      final_invalids.append(charRect)
+    for pos in invalid_party:
+      baseSkill_1_Pos = (pos[0]+(sprite_size//2)-(skill_size//2) , pos[1]-(skill_size*2))
+      baseSkill_2_Pos = (pos[0]+(sprite_size//2)-(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      sigSkillPos = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2))
+      sigSkillPos_2 = (pos[0]+(sprite_size//2)+(skill_size//2), pos[1]-(skill_size*2)+skill_size)
+      
+      base1rect = pygame.rect.Rect(baseSkill_1_Pos[0], baseSkill_1_Pos[1], skill_size, skill_size)
+      base2rect = pygame.rect.Rect(baseSkill_2_Pos[0], baseSkill_2_Pos[1], skill_size, skill_size)
+      sig1rect = pygame.rect.Rect(sigSkillPos[0], sigSkillPos[1], skill_size, skill_size)
+      sig2rect = pygame.rect.Rect(sigSkillPos_2[0], sigSkillPos_2[1], skill_size, skill_size)
+      charRect = pygame.rect.Rect(pos[0], pos[1], sprite_size, sprite_size)
+      
+      final_invalids.append(charRect)
+      final_invalids.append(base1rect)
+      final_invalids.append(base2rect)
+      final_invalids.append(sig1rect)
+      final_invalids.append(sig2rect)
+  
+  # rendering
+  for rect in final_invalids:
+    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    highlight.fill((255, 0, 0, 100))  # Red
+    screen.blit(highlight, (rect.x, rect.y))
+  for rect in final_validation:
+    highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    highlight.fill((0, 255, 0, 100))  # Green
+    screen.blit(highlight, (rect.x, rect.y))
+  return
 def DrawTargetingLine(start_pos, end_pos):
   # Calculate direction and distance
   dx = end_pos[0] - start_pos[0]
@@ -348,14 +538,6 @@ def CombatDescriptiveSurfaceRender():
   # under and continuing to the right = skill description
   # maybe per coin explanation
   return
-
-def SupportSkillsRender():
-  # render support skills - to be implemented
-  supportSurface = pygame.Surface((200,1080), pygame.SRCALPHA)
-  supportSurface.fill((0, 0, 30, 150))  # semi-transparent black
-
-  # condition for glowy filter
-  # render all support skills, filter depending on condition fulfilled
 #endregion
 
 #region Rendering
@@ -493,9 +675,9 @@ def CombatSceneRender(encounter=type(Encounter)):
   # check & handle collisions
   collisionPos = DetectCombatCollision(partyPositions, skillPositions, playerParty, enemyParty)
   # set temporary parties
-  global leftPartyChars, rightPartyChars
-  leftPartyChars = playerParty
-  rightPartyChars = enemyParty
+  global playerPartyChars, enemyPartyChars
+  playerPartyChars = playerParty
+  enemyPartyChars = enemyParty
   
   
   
@@ -558,6 +740,7 @@ def CombatSceneRender(encounter=type(Encounter)):
     start_pos = (selected_skill_pos[0]+(skill_size//2), selected_skill_pos[1]+(skill_size//2))
     DrawTargetingLine(start_pos, end_pos)
     DrawAllTargetedLines()
+    HighlightValidTargets(FindSkillByPosition(selected_skill_pos))
   
   pygame.display.flip()  # Update the display to show changes
 
@@ -620,7 +803,7 @@ def DetectCombatCollision(partyPositions=None, skillPositions=None, playerParty=
   mouse_pos = pygame.mouse.get_pos()
   if(selected_skill_pos != None):
     targeting = True
-    
+  
   # define rects for all characters & skills
   
   if(turnEndButton.collidepoint(mouse_pos) and click):
