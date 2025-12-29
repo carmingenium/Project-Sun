@@ -364,12 +364,12 @@ def main():
         continue
     if gamestate == "combat":
       encounterDefault.playerPartyCharacters = currentParty
-      renderer.CombatSceneRender(encounterDefault)
+      renderer.RenderCombatScene(encounterDefault)
     elif gamestate == "partyselect":
       renderer.RenderPartySelecter(playerParty)
     elif gamestate == "novel":
-      renderer.NovelSceneRender()
-    # renderer.RenderPartySelecter(playerParty)
+      # get story file and render accordingly
+      renderer.RenderNovelScene(playerParty[0], "this is a test.")
     clock.tick(FPS)  # Limit to 60 frames per second
   return
   

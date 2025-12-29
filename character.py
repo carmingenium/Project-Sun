@@ -232,17 +232,11 @@ class Character:
     self.speedRange = speed
     self.speed = self.calculate_speed() # calculated at turn start
     self.sanity = 0 # almost always starts as 0
-    self.hp = hp
+    self.max_hp = hp
+    self.hp = self.max_hp
     self.base_skills = base_skills
     self.sig_skills = sig_skills
-
-    
-  # def add_skill(self, skill_name, level):
-  #   new_skill = Skill.Skill(skill_name, level)
-  #   self.skills.append(new_skill)
-  
-  # def get_skills(self):
-  #   return [(s.name, s.level) for s in self.skills]
+    self.alive = True
 
   def calculate_speed(self):
     # speed var is a range, get a random value within that range
@@ -252,22 +246,16 @@ class Character:
 
   def take_damage(self, damage):
     self.hp -= damage
-    if self.hp < 0:
+    if self.hp <= 0:
       self.hp = 0
-      # death
+      self.die()
     return self.hp
   
-  def load_skills(self):
-    # this is the format when there are more skills
-    # self.currentBaseSkills = random.sample(self.base_skills, 2)
-    
-    # select 2 base skills randomly and load them to current base skills
-    
-    # load signature skills
-    
-    self.currentBaseSkills.append(self.base_skills[0])
-    self.currentBaseSkills.append(self.base_skills[0])
-    self.currentSigSkills.append(self.sig_skills[0])
+  def die(self):
+    # dead state which disables characters from using skills
+    self.alive = False
+    # sprite change
+    self.sprite = 'sprites/dead.png'
     return
 
 

@@ -50,9 +50,20 @@ turnEndReadyButtonSprite = pygame.transform.scale(turnEndReadyButtonSprite, (tur
 turnEndBlockedButtonSprite = pygame.transform.scale(turnEndBlockedButtonSprite, (turnEndBlockedButton.width, turnEndBlockedButton.height))
 characterSetupButtonSprite = pygame.transform.scale(characterSetupButtonSprite, (characterSetupButton.width, characterSetupButton.height))
 
+# delete before final date! testing button
+killAllButtonSprite = pygame.image.load('sprites/ui/kill_all_button.png').convert_alpha()
+killAllButton = pygame.Rect(50, 50, 200, 60)
+killAllButtonSprite = pygame.transform.scale(killAllButtonSprite, (killAllButton.width, killAllButton.height))
+
+
+
 # variables
 playerPartyPositions = []
 enemyPartyPositions = []
+
+# enemy targeting
+allEnemiesTargeted = False
+
 
 # temporary variables
 selected_skill_pos = None
@@ -174,6 +185,8 @@ def EnemySkillTargeting():
   
   for enemy in enemyPartyChars:
     # base skill
+    if(enemy.alive == False):
+      continue
     skillSelection = random.randint(0, 1) # base skill index
     skill = enemy.base_skills[skillSelection]
     valid_targets = []
@@ -204,7 +217,10 @@ def EnemySkillTargeting():
       continue
     target = random.choice(valid_targets)
     targeted_skills_list.append((skill, target))
-    targeted_skills_position_list.append( (FindPositionFromSkill(skill), FindPositionFromSkill(target) or FindPositionFromCharacter(target)) )
+    if(skill.available_targets[1] == "characters"):
+      targeted_skills_position_list.append( (FindPositionFromSkill(skill), FindPositionFromCharacter(target)) )
+    elif(skill.available_targets[1] == "skills"):
+      targeted_skills_position_list.append( (FindPositionFromSkill(skill), FindPositionFromSkill(target)) )
     
     
     
@@ -346,6 +362,13 @@ def findSkillSprite(skill):
     if sk.name == skill.name:
       index = skillList.index(sk)
       return skill_sprites[index]
+def findCharacterByPos_SelectScreen(pos, posList):
+  for charPos in posList:
+    if pos == charPos:
+      index = posList.index(charPos)
+      return allPlayerCharacters[index]
+  return None
+  
 
 def HighlightValidTargets(skill):
   # highlight valid targets for given skill in green, non-valid targets in red.
@@ -590,7 +613,6 @@ def RenderCharacterSurface(character, sprite, characterPos, collisionPos, select
   # speed
   charSurface.blit(speed_text, speed_centered) # 60
   return charSurface
-
 def BaseSkillSurface(character, globalPosition, collisionPos=None):
   # game.py needs to calculate skills that will be shown here later
   skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
@@ -621,7 +643,6 @@ def BaseSkillSurface(character, globalPosition, collisionPos=None):
     else: 
       skillSurface.blit(renderSkillSprite2, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
   return skillSurface
-
 def SignatureSkillSurface(character, globalPosition, collisionPos=None):
   # game.py needs to calculate skills that will be shown here later
   skillSurface = pygame.Surface((32, 64), pygame.SRCALPHA)
@@ -653,7 +674,7 @@ def SignatureSkillSurface(character, globalPosition, collisionPos=None):
       skillSurface.blit(renderSkillSprite2, (rect.x - globalPosition[0], rect.y - globalPosition[1]))  
   return skillSurface
 
-def renderNovelScene(character, dialogue_line):
+def RenderNovelScene(character, dialogue_line):
   # start drawing
   # find speaking character
   # load sprite in novel format
@@ -678,19 +699,33 @@ def renderNovelScene(character, dialogue_line):
   
   
   pygame.display.flip()  # Update the display to show changes
-
-def CombatSceneRender(encounter=type(Encounter)):
+def RenderCombatScene(encounter=type(Encounter)):
   enemyParty = encounter.encounterPartyCharacters
+  # win state condition
+  if(all(not char.alive for char in enemyParty)):
+    AdvanceGameState("novel")
+    return
+  
   playerParty = encounter.playerPartyCharacters
+  # lose state condition
+  if(all(not char.alive for char in playerParty)):
+    AdvanceGameState("partyselect")
+    # reset all characters (max hp)
+  
   # calculate all positions
   partyPositions, skillPositions = CombatSpriteTransformCalculation(encounter)
   # check & handle collisions
   collisionPos = DetectCombatCollision(partyPositions, skillPositions, playerParty, enemyParty)
   # set temporary parties
-  global playerPartyChars, enemyPartyChars
-  playerPartyChars = playerParty
-  enemyPartyChars = enemyParty
+  global playerPartyChars, enemyPartyChars, allEnemiesTargeted
+  playerPartyChars = playerParty.copy()
+  enemyPartyChars = enemyParty.copy()
   
+  
+  #enemy targeting
+  if(not allEnemiesTargeted):
+    EnemySkillTargeting()
+    allEnemiesTargeted = True
   
   
   # render
@@ -699,19 +734,32 @@ def CombatSceneRender(encounter=type(Encounter)):
   combatBGRender = findBackgroundForEncounter(encounter)
   combatBGRender = pygame.transform.scale(combatBGRender, (x, y))
   screen.blit(combatBGRender, (0, 0))  # Draw the background image
+  
   # constant UI
-  screen.blit(turnEndBlockedButtonSprite, (turnEndBlockedButton.x, turnEndBlockedButton.y)) 
+  screen.blit(killAllButtonSprite, (killAllButton.x, killAllButton.y))
+  if(CalculateTurnEndPrerequisites()):
+    screen.blit(turnEndReadyButtonSprite, (turnEndReadyButton.x, turnEndReadyButton.y))
+  else:
+    screen.blit(turnEndBlockedButtonSprite, (turnEndBlockedButton.x, turnEndBlockedButton.y)) 
   
   #PlayerParty
   for char in playerParty or []:
-    sprite = findCharacterSprite(char)
     index = playerParty.index(char)
+    
+    CharacterPosition = partyPositions[0][index]
+    SkillsPosition = (skillPositions[0][index*2]) # position of the top skill is used for the surface that contains both.
+    SigSkillPosition = (skillPositions[1][index*2]) # position of the top skill is used for the surface that contains both.
+    
+    if(char.alive == False):
+      sprite = pygame.image.load("assets/sprites/dead_brute.png")
+      screen.blit(pygame.transform.scale(sprite, (sprite_size, sprite_size)), CharacterPosition)
+      continue
+    sprite = findCharacterSprite(char)
+    
     
     # render positions
     # CharacterPosition = encounter.encounterPartyPositions[index] 
-    CharacterPosition = partyPositions[0][index] # NOT A HEALTHY SOLUTION FOR THE SKILLS!!!
-    SkillsPosition = (skillPositions[0][index*2]) # position of the top skill is used for the surface that contains both.
-    SigSkillPosition = (skillPositions[1][index*2]) # position of the top skill is used for the surface that contains both.
+
     # surface prep & collision
     characterSurface = RenderCharacterSurface(char, sprite, CharacterPosition, collisionPos)
     skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
@@ -725,12 +773,21 @@ def CombatSceneRender(encounter=type(Encounter)):
       
   #EnemyParty
   for char in enemyParty or []:
-    sprite = findCharacterSprite(char)
     index = enemyParty.index(char)
     
     CharacterPosition = partyPositions[1][index]
     SkillsPosition = (skillPositions[2][index*2]) # position of the top skill is used for the surface that contains both.
     SigSkillPosition = (skillPositions[3][index*2]) # position of the top skill is used for the surface that contains both.
+    
+    if(char.alive == False):
+      sprite = pygame.image.load("assets/sprites/dead.png")
+      screen.blit(pygame.transform.scale(sprite, (sprite_size, sprite_size)), CharacterPosition)
+      continue
+    
+    sprite = findCharacterSprite(char)
+
+    
+    
     # surface prep & collision
     characterSurface = RenderCharacterSurface(char, sprite, CharacterPosition, collisionPos)
     skillSurface = BaseSkillSurface(char, SkillsPosition, collisionPos)
@@ -755,7 +812,6 @@ def CombatSceneRender(encounter=type(Encounter)):
     HighlightValidTargets(FindSkillByPosition(selected_skill_pos))
   
   pygame.display.flip()  # Update the display to show changes
-
 def RenderPartySelecter(availableCharacters):
   # draw bg
   characterSelectBG = pygame.transform.scale(barBG, (x, y))
@@ -763,8 +819,9 @@ def RenderPartySelecter(availableCharacters):
   # character amount = 8 to 7
   characterPositions = barCharacterPositions.copy()
   # collider
-  collisionPos = DetectPartySelectCollision(characterPositions)
-  
+  collisionPos, descSurface = DetectPartySelectCollision(characterPositions)
+  if(descSurface != None):
+    screen.blit(descSurface, (0, 0))
     
   
   # draw characters
@@ -790,6 +847,37 @@ def RenderPartySelecter(availableCharacters):
   # Update the display to show what was drawn
   pygame.display.flip()
   return
+
+def RenderDescriptions(char=None, skill=None):
+  descriptionSurface = None
+  if(char != None):
+    # render character description
+    descriptionSurface = pygame.Surface((1920, 300), pygame.SRCALPHA)
+    descriptionSurface.fill((255, 215, 0, 120))
+    
+    font = pygame.font.Font(None, 24)
+    name_text = font.render(f"Name: {char.name}", True, (255, 255, 255))
+    for skill in char.base_skills + char.sig_skills:
+      desc_text = font.render(f"Description: {skill.description}", True, (255, 255, 255))
+      descriptionSurface.blit(desc_text, (10, 130 + (30 * (char.base_skills + char.sig_skills).index(skill))))
+    descriptionSurface.blit(name_text, (10, 10))
+    
+    screen.blit(descriptionSurface, (0, 0))  # position at bottom-right corner
+  elif(skill != None):
+    # render skill description
+    descriptionSurface = pygame.Surface((1920, 300), pygame.SRCALPHA)
+    descriptionSurface.fill((255, 215, 0, 120))
+    
+    font = pygame.font.Font(None, 24)
+    target_text = font.render(f"Targets: {skill.available_targets}", True, (255, 255, 255))
+    desc_text = font.render(f"Description: {skill.description}", True, (255, 255, 255))
+    
+
+    descriptionSurface.blit(target_text, (1000, 10))
+    descriptionSurface.blit(desc_text, (10, 10))
+    
+    screen.blit(descriptionSurface, (0, 0))  # position at bottom-right corner
+  return descriptionSurface
 #endregion
 
 #region Collision Handling
@@ -798,7 +886,7 @@ def ClickEvent(state, partyPositions=None, skillPositions=None, playerParty=None
   if(state == "combat"):
     clickPos = DetectCombatCollision(partyPositions, skillPositions, playerParty, enemyParty, click=True)
   elif(state == "partyselect"):
-    clickPos = DetectPartySelectCollision(barCharacterPositions, click=True)
+    clickPos, descSurface = DetectPartySelectCollision(barCharacterPositions, click=True)
     if(selectedPartyCharacters.count(None) == 0):
       return selectedPartyCharacters
   elif(state == "novel"):
@@ -822,6 +910,8 @@ def DetectCombatCollision(partyPositions=None, skillPositions=None, playerParty=
   
   if(turnEndReadyButton.collidepoint(mouse_pos) and click): # button rects are the same 
     return HandleTurnEndClick()
+  if(killAllButton.collidepoint(mouse_pos) and click):
+    return killAllEnemies()
   
   # currently no character interaction - commented
   for pos in partyPositions[0] or []:
@@ -853,13 +943,13 @@ def DetectCombatCollision(partyPositions=None, skillPositions=None, playerParty=
   for pos in skillPositions[2] or []:
     rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size)
     if rect.collidepoint(mouse_pos):
-      if(click):
+      if(click and targeting):
         return HandleBaseSkillClick(pos, targeting)
       return (pos)
   for pos in skillPositions[3] or []:
     rect = pygame.Rect(pos[0], pos[1], skill_size, skill_size)
     if rect.collidepoint(mouse_pos):
-      if(click):
+      if(click and targeting):
         return HandleSignatureSkillClick(pos, targeting)
       return (pos)
 
@@ -876,13 +966,14 @@ def DetectPartySelectCollision(posList, click = False):
   for pos in posList:
     rect = pygame.Rect(pos[0], pos[1], sprite_size, sprite_size)
     if rect.collidepoint(mouse_pos):
+      descSurface = RenderDescriptions(char=findCharacterByPos_SelectScreen(pos, posList))
       if(click):
         HandleCharacterSelect(mouse_pos)
-      return pos
+      return pos, descSurface
   if(characterSetupButton.collidepoint(pygame.mouse.get_pos()) and click): # if selection is being finalized
     if(selectedPartyCharacters.count(None) == 0):
       HandleSelectionEnd()
-  return None
+  return None, None
 
 def HandleCharacterSelect(clickPos):
   global selectedPartyCharacters, benchedPartyCharacters, barCharacterPositions
@@ -955,9 +1046,11 @@ def HandleSignatureSkillClick(clickPos, targeting):
 def HandleTurnEndClick():
   if(CalculateTurnEndPrerequisites()):
     EndTurn()
-  else:
-    WarnPlayer()
   return
+
+def killAllEnemies():
+  for enemy in enemyPartyChars:
+    enemy.take_damage(enemy.hp)
 #endregion
 
 #region turn system & game state
@@ -969,7 +1062,11 @@ def AdvanceGameState(given_state):
 
 def CalculateTurnEndPrerequisites():
   skill = None
-  for skill in skillList: # enemy skills need to be appointed in a guaranteed running function
+  current_skillList = []
+  for char in playerPartyChars + enemyPartyChars:
+    if(char.alive):
+      current_skillList += char.base_skills + char.sig_skills
+  for skill in current_skillList: # enemy skills need to be appointed in a guaranteed running function
     if(skill not in targeted_skills_list):
       # check if character used another skill in the same type
       user = FindCharacterBySkill(skill)
