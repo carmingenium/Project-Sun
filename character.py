@@ -17,8 +17,12 @@ class Skill:
     return f"Skill(name={self.name}, description={self.description}, damage={self.damage})"
 
   def use(self, user, target):
-    # chance = user.sp + 50
-    # self.implementation(self, target) 
+    chance = user.sp + 50
+    random_roll = random.randint(1, 100)
+    if random_roll > chance:
+      print(f"{user.name}'s skill {self.name} missed!") # maybe dialog over character?
+      return
+    self.implementation(self, target) 
     return
 
 #region Skill Functions
@@ -257,7 +261,19 @@ class Character:
     # sprite change
     self.sprite = 'sprites/dead.png'
     return
-
+  
+  def add_sanity(self, amount):
+    if(self.sanity + amount <= -50):
+      self.sanity = 0
+      self.insanity()
+    elif(self.sanity + amount >= 50):
+      self.sanity = 50
+    self.sanity += amount
+    
+    return self.sanity
+  def insanity(self):
+    # handle insanity effects here
+    return
 
 #region CHARACTER INITIALIZATION
 def initialize_characters(renderer):

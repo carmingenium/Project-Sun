@@ -162,7 +162,7 @@ def initializeCharacters():
     sprite='sprites/characters/player/medic.png',
     speed=(4, 6),
     hp=100,
-    base_skills=[character.Skill("Hypospray", 15, 'sprites/skills/skill1.png', character.medic_baseskill1, "Baseskill1", ["player", "characters"]),
+    base_skills=[character.Skill("Physical Hypospray", 15, 'sprites/skills/skill1.png', character.medic_baseskill1, "Baseskill1", ["player", "characters"]),
                  character.Skill("First Aid", 15, 'sprites/skills/skill2.png', character.medic_baseskill2, "Baseskill2", ["player", "characters"])],    
     sig_skills=[character.Skill("Adrenaline Boost", 15, 'sprites/skills/evade.png', character.medic_sigskill1, "Sigskill1", ["player", "characters"]),
                 character.Skill("Electroshock", 15, 'sprites/skills/def.png', character.medic_sigskill2, "Sigskill2", ["player", "skills"])]
