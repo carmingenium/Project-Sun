@@ -88,10 +88,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/unknown.png',
     speed=(3, 7),
     hp=100,
-    base_skills=[character.Skill("Toolbox", 10, 'sprites/skills/skill1.png', character.unknown_baseskill1, "Baseskill1", ["enemy", "characters"]),
-                 character.Skill("Mysterious Syringe", 10, 'sprites/skills/skill2.png', character.unknown_baseskill2, "Baseskill2", ["all", "characters"])],
-    sig_skills=[character.Skill("Suspicious Attack", 10, 'sprites/skills/evade.png', character.unknown_sigskill1, "Sigskill1", ["enemy", "characters"]),
-                character.Skill("Stolen Shield", 10, 'sprites/skills/def.png', character.unknown_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Toolbox", 10, 'sprites/skills/skill1.png', character.unknown_baseskill1, "Hits an enemy with a toolbox, deals 10 damage.", ["enemy", "characters"]),
+                 character.Skill("Mysterious Syringe", 6, 'sprites/skills/skill2.png', character.unknown_baseskill2, "Uses a mysterious syringe, effect unknown.", ["all", "characters"])],
+    sig_skills=[character.Skill("Suspicious Baton", 5, 'sprites/skills/evade.png', character.unknown_sigskill1, "Uses a stun baton to decrease targets speed by 1, deals 5 damage.", ["enemy", "characters"]),
+                character.Skill("Stolen Shield", 5, 'sprites/skills/def.png', character.unknown_sigskill2, "Blocks incoming attacks, reducing damage by 5. Also has a chance to fully block damage.", ["enemy", "skills"])]
   )
   characterSetup(unknown, playerParty)
   
@@ -100,10 +100,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/hos.png',
     speed=(4, 7),
     hp=120,
-    base_skills=[character.Skill("Taser Shot", 10, 'sprites/skills/skill1.png', character.hos_baseskill1, "Baseskill1", ["enemy", "characters"]),
-                 character.Skill("Shield Bash", 10, 'sprites/skills/skill2.png', character.hos_baseskill2, "Baseskill2", ["enemy", "characters"])],
-    sig_skills=[character.Skill("Shotgun Unload", 10, 'sprites/skills/evade.png', character.hos_sigskill1, "Sigskill1", ["enemy", "characters"]),
-                character.Skill("Fortify Position", 10, 'sprites/skills/def.png', character.hos_sigskill2, "Sigskill2", ["player", "characters"])]
+    base_skills=[character.Skill("Taser Shot", 4, 'sprites/skills/skill1.png', character.hos_baseskill1, "Tasers an enemy, deals 4 damage. Decreases speed by one from target.", ["enemy", "characters"]),
+                 character.Skill("Shield Bash", 10, 'sprites/skills/skill2.png', character.hos_baseskill2, "Bashes an enemy with the shield.", ["enemy", "characters"])],
+    sig_skills=[character.Skill("Shotgun Unload", 15, 'sprites/skills/evade.png', character.hos_sigskill1, "Shoots an enemy with a shotgun, deals 15 damage.", ["enemy", "characters"]),
+                character.Skill("Fortify Position", 2, 'sprites/skills/def.png', character.hos_sigskill2, "Fortifies position, gaining speed for this turn.", ["player", "characters"])]
     
   )
   characterSetup(hos, playerParty)
@@ -113,10 +113,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/secoff.png',
     speed=(3, 6),
     hp=110,
-    base_skills=[character.Skill("Baton Strike", 10, 'sprites/skills/skill1.png', character.secoff_baseskill1, "Baseskill1", ["enemy", "characters"]),
-                 character.Skill("Pepper Spray", 10, 'sprites/skills/skill2.png', character.secoff_baseskill2, "Baseskill2", ["enemy", "characters"])],
-    sig_skills=[character.Skill("Call Backup", 10, 'sprites/skills/evade.png', character.secoff_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Expect Attack", 10, 'sprites/skills/def.png', character.secoff_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Baton Strike", 2, 'sprites/skills/skill1.png', character.secoff_baseskill1, "Deals 2 damage with a baton strike. Disorients the enemy by decreasing their speed by 1.", ["enemy", "characters"]),
+                 character.Skill("Pepper Spray", 8, 'sprites/skills/skill2.png', character.secoff_baseskill2, "Sprays pepper spray, dealing 8 damage.", ["enemy", "characters"])],
+    sig_skills=[character.Skill("Energy Gun", 12, 'sprites/skills/evade.png', character.secoff_sigskill1, "Deals 12 damage with an energy gun.", ["player", "characters"]),
+                character.Skill("Expect Attack", 10, 'sprites/skills/def.png', character.secoff_sigskill2, "Prepares to expect an attack, decreasing incoming damage by 10.", ["enemy", "skills"])]
     
   )
   characterSetup(secoff, playerParty)
@@ -126,10 +126,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/clown.png',
     speed=(4, 8),
     hp=90,
-    base_skills=[character.Skill("Pie Throw", 10, 'sprites/skills/skill1.png', character.clown_baseskill1, "Baseskill1", ["all", "characters"]),
-                 character.Skill("Vicious Mockery", 10, 'sprites/skills/skill2.png', character.clown_baseskill2, "Baseskill2", ["all", "characters"])],
-    sig_skills=[character.Skill("Laughing Gas", 10, 'sprites/skills/evade.png', character.clown_sigskill1, "Sigskill1", ["all", "characters"]),
-                character.Skill("Lie Down", 10, 'sprites/skills/def.png', character.clown_sigskill2, "Sigskill2", ["player", "skills"])] # does not need to be targetable, could add a 'click only' category
+    base_skills=[character.Skill("Pie Throw", 3, 'sprites/skills/skill1.png', character.clown_baseskill1, "Throws a pie at the enemy, decreasing speed by 3.", ["all", "characters"]),
+                 character.Skill("Vicious Mockery", 10, 'sprites/skills/skill2.png', character.clown_baseskill2, "Mocks the target, dealing 10 sanity damage.", ["all", "characters"])],
+    sig_skills=[character.Skill("Laughing Gas", 5, 'sprites/skills/evade.png', character.clown_sigskill1, "Throws a gas bomb, causing various effects.", ["all", "characters"]),
+                character.Skill("Lie Down", 20, 'sprites/skills/def.png', character.clown_sigskill2, "Lies down to rest.", ["player", "skills"])] # does not need to be targetable, could add a 'click only' category !!! 
     
   )
   characterSetup(clown, playerParty)
@@ -139,23 +139,22 @@ def initializeCharacters():
     sprite='sprites/characters/player/mime.png',
     speed=(4, 7),
     hp=95,
-    base_skills=[character.Skill("Banana Slip", 13, 'sprites/skills/skill1.png', character.mime_baseskill1, "Baseskill1", ["enemy", "characters"]),
-                 character.Skill("Silent Mockery", 13, 'sprites/skills/skill2.png', character.mime_baseskill2, "Baseskill2", ["enemy", "characters"])],
-    sig_skills=[character.Skill("Silent Strike", 13, 'sprites/skills/evade.png', character.mime_sigskill1, "Sigskill1", ["enemy", "characters"]),
-                character.Skill("Invisible Wall", 13, 'sprites/skills/skill1.png', character.mime_sigskill2, "Sigskill2", ["all", "characters"])]
+    base_skills=[character.Skill("Banana Slip", 3, 'sprites/skills/skill1.png', character.mime_baseskill1, "Throws a banana peel to make the enemy slip, decreasing their speed by 3.", ["all", "characters"]),
+                 character.Skill("Silent Mockery", 10, 'sprites/skills/skill2.png', character.mime_baseskill2, "Silently mocks the target, dealing 10 sanity damage.", ["all", "characters"])],
+    sig_skills=[character.Skill("Silent Strike", 5, 'sprites/skills/evade.png', character.mime_sigskill1, "Silently strikes the enemy, dealing 10 damage.", ["enemy", "characters"]),
+                character.Skill("Invisible Wall", 10, 'sprites/skills/skill1.png', character.mime_sigskill2, "Creates an invisible wall to decrease 10 damage from incoming attack", ["enemy", "skill"])]
   )
   characterSetup(mime, playerParty) 
   
-  # could initialize with together with the syndie counterpart
   borg = character.Character(
     name="Mediborg",
     sprite='sprites/characters/player/medicalborg_south.png',
     speed=(3, 5),
     hp=130,
-    base_skills=[character.Skill("Medibeam", 15, 'sprites/skills/skill1.png', character.borg_baseskill1, "Baseskill1", ["player", "characters"]),    
-                 character.Skill("Hypospray", 15, 'sprites/skills/skill2.png', character.borg_baseskill2, "Baseskill2", ["player", "characters"])],
-    sig_skills=[character.Skill("Nanite Swarm", 15, 'sprites/skills/evade.png', character.borg_sigskill1, "Sigskill1", ["player", "characters"])
-                ,character.Skill("Reinforced Plating", 15, 'sprites/skills/def.png', character.borg_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Medibeam", 8, 'sprites/skills/skill1.png', character.borg_baseskill1, "Heals target organism by 8", ["all", "characters"]),    
+                 character.Skill("Hypospray", 5, 'sprites/skills/skill2.png', character.borg_baseskill2, "Uses built in hypospray to inject chemicals. Heals by 5 and increases speed by 1", ["all", "characters"])],
+    sig_skills=[character.Skill("Nanite Swarm", 1, 'sprites/skills/evade.png', character.borg_sigskill1, "Swarms the target with nanite bots, disorienting them", ["all", "characters"]),
+                character.Skill("Reinforced Plating", 15, 'sprites/skills/def.png', character.borg_sigskill2, "Gets in the way of one of the attacks, which target player was being targeted by.", ["player", "characters"])]
   )
   characterSetup(borg, playerParty)
   
@@ -164,10 +163,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/medic.png',
     speed=(4, 6),
     hp=100,
-    base_skills=[character.Skill("Physical Hypospray", 15, 'sprites/skills/skill1.png', character.medic_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("First Aid", 15, 'sprites/skills/skill2.png', character.medic_baseskill2, "Baseskill2", ["player", "characters"])],    
-    sig_skills=[character.Skill("Adrenaline Boost", 15, 'sprites/skills/evade.png', character.medic_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Electroshock", 15, 'sprites/skills/def.png', character.medic_sigskill2, "Sigskill2", ["player", "skills"])]
+    base_skills=[character.Skill("Physical Hypospray", 8, 'sprites/skills/skill1.png', character.medic_baseskill1, "Uses a physical hypospray to inject chemicals.", ["player", "characters"]),
+                 character.Skill("First Aid", 12, 'sprites/skills/skill2.png', character.medic_baseskill2, "Heals target by 12", ["player", "characters"])],    
+    sig_skills=[character.Skill("Adrenaline Boost", 2, 'sprites/skills/evade.png', character.medic_sigskill1, "Gives an adrenaline boost, increasing speed by 2.", ["player", "characters"]),
+                character.Skill("Electroshock", 10, 'sprites/skills/def.png', character.medic_sigskill2, "Electroshocks the target, dealing 10 damage.", ["player", "skills"])]
     
   )
   characterSetup(felinid, playerParty)

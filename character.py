@@ -18,11 +18,12 @@ class Skill:
     return f"Skill(name={self.name}, description={self.description}, damage={self.damage})"
 
   def use(self, user, target):
-    chance = user.sp + 50
-    random_roll = random.randint(1, 100)
-    if random_roll > chance:
-      print(f"{user.name}'s skill {self.name} missed!") # maybe dialog over character?
-      return
+    if(self != user.sig_skills[1]): # if not a defense skill
+      chance = user.sp + 50
+      random_roll = random.randint(1, 100)
+      if random_roll > chance:
+        print(f"{user.name}'s skill {self.name} missed!") # maybe dialog over character?
+        return
     self.implementation(self, target) 
     # after skill is used, restore to base format.
     self.currentdamage = self.damage 
@@ -35,7 +36,7 @@ def engineer_baseskill1(self, target):
   target.take_damage(self.currentdamage)
   return
 def engineer_baseskill2(self, target):
-  if(target.name == "Borg"):
+  if(target.name == "Mediorg"):
     target.hp += self.currentdamage #healing effect
     if target.hp > target.max_hp:
       target.hp = target.max_hp
@@ -55,101 +56,163 @@ def engineer_sigskill2(self, target): # decrease damage of target skill by 16 fo
   return
 #endregion
 #region Unknown
-def unknown_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def unknown_baseskill1(self, target):
+  target.take_damage(self.currentdamage) 
   return
-def unknown_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def unknown_baseskill2(self, target):
+  if(target.name == "Mediborg"):
+    return
+  if(target.name == "Head of Security"):
+    target.hp += self.damage #healing effect
+    if(target.hp > target.max_hp):
+      target.hp = target.max_hp
+    return
+  if(target.name == "Security Officer"):
+    target.hp += self.damage // 2 #healing effect
+    if(target.hp > target.max_hp):
+      target.hp = target.max_hp
+    return
+
+  # Determine if target is an enemy (not in player party)
+  # For this context, treat 'enemy' as not one of the following names:
+  other_player_names = ["Blacked out Engineer", "Unknown", "Clown", "Mime", "Medic"]
+  if target.name not in other_player_names:
+    target.take_damage(self.damage)
+    self.user.add_sanity(-10)
+    return
+  else:
+    self.user.add_sanity(-5)
+    return
+def unknown_sigskill1(self, target):
+  target.take_damage(self.currentdamage)
+  target.currentSpeed -= 1
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1
   return
-def unknown_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
-  return
-def unknown_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def unknown_sigskill2(self, target):
+  target.currentdamage -= self.currentdamage
+  if target.currentdamage < 0:
+    target.currentdamage = 0
+  random_roll = random.randint(1, 100)
+  if random_roll <= 30:
+    return
+  target.take_damage(self.currentdamage)
   return
 #endregion
 #region Head of Security
-def hos_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def hos_baseskill1(self, target):
+  target.take_damage(self.damage)
+  target.currentSpeed -= 1
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1
   return
-def hos_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def hos_baseskill2(self, target):
+  target.take_damage(self.damage)
   return
-def hos_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def hos_sigskill1(self, target):
+  target.take_damage(self.damage)
   return
-def hos_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def hos_sigskill2(self, target):
+  target.currentSpeed += self.damage 
   return
 #endregion
 #region Security Officer
-def secoff_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def secoff_baseskill1(self, target):
+  target.take_damage(self.damage) 
+  target.currentSpeed -= 1
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1
+def secoff_baseskill2(self, target):
+  target.take_damage(self.damage) 
   return
-def secoff_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def secoff_sigskill1(self, target):
+  target.take_damage(self.damage) 
   return
-def secoff_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
-  return
-def secoff_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def secoff_sigskill2(self, target):
+  target.currentdamage -= self.damage
+  if target.currentdamage < 0:
+    target.currentdamage = 0 
   return
 #endregion
 #region Clown
-def clown_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def clown_baseskill1(self, target):
+  target.currentSpeed -= self.damage
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1
   return
-def clown_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def clown_baseskill2(self, target):
+  target.add_sanity(-self.damage)
   return
-def clown_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def clown_sigskill1(self, target):
+  other_player_names = ["Blacked out Engineer", "Unknown", "Clown", "Mime", "Medic", "Head of Security", "Security Officer"]
+  if target.name in other_player_names:
+    target.add_sanity(self.damage)
+  else:
+    target.add_sanity(-self.damage)
   return
-def clown_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def clown_sigskill2(self, target): # CLICK SKILL, lastly used maybe?
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp
   return
 #endregion
 #region Mime
-def mime_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def mime_baseskill1(self, target):
+  target.currentSpeed -= self.damage
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1
   return
-def mime_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def mime_baseskill2(self, target):
+  target.add_sanity(-self.damage)
   return
-def mime_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def mime_sigskill1(self, target):
+  target.take_damage(self.damage)
   return
-def mime_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def mime_sigskill2(self, target):
+  target.currentdamage -= self.damage
+  if target.currentdamage < 0:
+    target.currentdamage = 0
   return
 #endregion
 #region Borg
-def borg_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def borg_baseskill1(self, target):
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp
   return
-def borg_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def borg_baseskill2(self, target): # speed related
+  target.currentSpeed += 1
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp
   return
-def borg_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def borg_sigskill1(self, target): #not implemented
+  target.take_damage(self.damage) 
   return
-def borg_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def borg_sigskill2(self, target): #not implemented
+  target.take_damage(self.damage) 
   return
 #endregion
 #region Medic
-def medic_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def medic_baseskill1(self, target):
+  other_player_names = ["Blacked out Engineer", "Unknown", "Clown", "Mime", "Head of Security", "Security Officer"]
+  if target.name in other_player_names:
+    target.hp += self.damage
+    if target.hp > target.max_hp:
+      target.hp = target.max_hp
+  else:
+    target.take_damage(self.damage)
   return
-def medic_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def medic_baseskill2(self, target):
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp 
   return
-def medic_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def medic_sigskill1(self, target):
+  target.currentSpeed += self.damage
   return
-def medic_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def medic_sigskill2(self, target):
+  target.take_damage(self.damage) 
   return
 #endregion
 
@@ -157,82 +220,82 @@ def medic_sigskill2(user, target):
 
 #region Encounter1
 #region Carps
-def carp_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def carp_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def carp_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def carp_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def carp_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def carp_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def carp_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def carp_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 #endregion
 #endregion
 
 #region Encounter2
 #region Changeling #hopefully form changing.
-def changeling_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def changeling_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def changeling_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def changeling_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def changeling_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def changeling_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def changeling_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def changeling_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 #endregion
 #region Traitor
-def traitor_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def traitor_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def traitor_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def traitor_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def traitor_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def traitor_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def traitor_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def traitor_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 #endregion
 #endregion
 
 #region Encounter3
 #region Heretic
-def heretic_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def heretic_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def heretic_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def heretic_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def heretic_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def heretic_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def heretic_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def heretic_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 #endregion
 #endregion
 
 #region Encounter4
 #region Dragon
-def dragon_baseskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def dragon_baseskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def dragon_baseskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def dragon_baseskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def dragon_sigskill1(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def dragon_sigskill1(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
-def dragon_sigskill2(user, target):
-  target.take_damage(user.damage) #get dmg from skill object
+def dragon_sigskill2(self, target):
+  target.take_damage(self.damage) #get dmg from skill object
   return
 #endregion
 #endregion
