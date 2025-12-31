@@ -27,8 +27,10 @@ encounterParty1 = []
 encounterParty2 = []
 encounterParty3 = []
 encounterParty4 = []
-# dialogues
-dialogueList = []
+# novel
+novelList = [ # 4 encounters, 5 dialogues => pre 1, post 1, post 2, post 3, post 4
+  [], [], [], [], []
+]
 
 #endregion
 
@@ -37,12 +39,22 @@ def initializeGame():
   
   # loading all story files - reserved for later
   
-  # story_dir = "story"
-  # for filename in os.listdir(story_dir): 
-  #   if filename.endswith(".txt"):
-  #     with open(os.path.join(story_dir, filename), "r", encoding="utf-8") as f:
-  #       dialog_lines = [line.strip() for line in f.readlines()]
-  #       dialogueList.append((filename, dialog_lines))
+  # NOVEL INITIALIZATION:
+  # set novel list with amount of story precalculated.
+  global novelList
+  # load all text and characters from txt file into proper lists
+  story_dir = "story"
+  
+  for filename in os.listdir(story_dir): 
+    dialogueList = []
+    if filename.endswith(".txt"):
+      index = int(filename.split("_")[0]) - 1  # assuming filenames are like '1_level.txt'
+      with open(os.path.join(story_dir, filename), "r", encoding="utf-8") as f:
+        dialog_lines = [line.strip() for line in f.readlines()]
+        dialogueList.append((filename, dialog_lines))
+    novelList[index] = dialogueList
+  # load in game by index.
+
   
   pygame.init()
   global clock

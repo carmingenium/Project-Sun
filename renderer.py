@@ -32,7 +32,7 @@ renderposRight = (1400, 200)
 renderposLeft = (100, 200)
 
 
-game_state = "partyselect" # "partyselect", "novel", "combat"
+game_state = "novel" # "partyselect", "novel", "combat"
 
 
 # Backgrounds and UI Buttons
