@@ -6,12 +6,13 @@ class Skill:
   def __init__(self, name, damage, sprite, implementation, description = f"Deals X damage.", available_targets=[("enemy", "skills")]):
     self.name = name
     self.damage = damage
+    self.currentdamage = damage
     self.implementation = implementation
     self.description = description
     self.sprite = sprite
     
     self.available_targets = available_targets # [("friendly", "skills"), ("friendly, characters"), ("enemy", "characters"), ("enemy", "skills")] ("all") for both categories, ("click") for no targets?
-    # animation (stop motion, so sprite list here for coins to select from maybe)
+    self.user = None
 
   def __repr__(self):
     return f"Skill(name={self.name}, description={self.description}, damage={self.damage})"
@@ -23,23 +24,34 @@ class Skill:
       print(f"{user.name}'s skill {self.name} missed!") # maybe dialog over character?
       return
     self.implementation(self, target) 
+    # after skill is used, restore to base format.
+    self.currentdamage = self.damage 
     return
 
 #region Skill Functions
 #region Player Skills
-#region Engineer
+#region Engineer DONE
 def engineer_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.currentdamage)
   return
 def engineer_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  if(target.name == "Borg"):
+    target.hp += self.currentdamage #healing effect
+    if target.hp > target.max_hp:
+      target.hp = target.max_hp
+    return
+  target.take_damage(self.currentdamage) 
   return
 
 def engineer_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.currentdamage)
+  self.user.add_sanity(10)
   return
-def engineer_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+def engineer_sigskill2(self, target): # decrease damage of target skill by 16 for 1 turn
+  target.currentdamage -= self.currentdamage
+  if target.currentdamage < 0:
+    target.currentdamage = 0
+  target.take_damage(self.currentdamage)
   return
 #endregion
 #region Unknown

@@ -60,8 +60,10 @@ def characterSetup(character, party):
   global skillslist, characterslist
   for base_skill in character.base_skills:
     skillslist.append(base_skill)
+    base_skill.user = character
   for sig_skill in character.sig_skills:
     skillslist.append(sig_skill)
+    sig_skill.user = character
   characterslist.append(character)
   party.append(character)
   return
@@ -74,10 +76,10 @@ def initializeCharacters():
     sprite='sprites/characters/player/engineer.png',
     speed=(3, 6),
     hp=100,
-    base_skills=[character.Skill("Clink Clank", 10, 'sprites/skills/skill1.png', character.engineer_baseskill1, "Baseskill1", ["enemy", "characters"]),
-                  character.Skill("GET WELDED", 5, 'sprites/skills/skill2.png', character.engineer_baseskill2,  "Baseskill2", ["all", "characters"])],
-    sig_skills=[character.Skill("Ray Emitter", 8, 'sprites/skills/evade.png', character.engineer_sigskill1, "Sigskill1", ["enemy", "characters"]),
-                character.Skill("We need to build a wall", 16, 'sprites/skills/def.png', character.engineer_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Clink Clank", 10, 'sprites/skills/skill1.png', character.engineer_baseskill1, "Hits an enemy with a wrench, deals 10 damage.", ["enemy", "characters"]),
+                  character.Skill("GET WELDED", 8, 'sprites/skills/skill2.png', character.engineer_baseskill2,  "Welds a target for 8 damage. If target is mechanical, heals it instead.", ["all", "characters"])],
+    sig_skills=[character.Skill("Ray Emitter", 6, 'sprites/skills/evade.png', character.engineer_sigskill1, "Burns an enemy with a ray emitter, deals 6 damage. If it hits, increases sanity by 10", ["enemy", "characters"]),
+                character.Skill("We need to build a wall", 10, 'sprites/skills/def.png', character.engineer_sigskill2, "Builds a wall with Rapid Construction Device, negating 10 damage from an enemy attack. ", ["enemy", "skills"])]
   )
   characterSetup(player, playerParty)
   

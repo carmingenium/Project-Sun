@@ -870,27 +870,28 @@ def RenderDescriptions(char=None, skill=None):
   descriptionSurface = None
   if(char != None):
     # render character description
-    descriptionSurface = pygame.Surface((1920, 300), pygame.SRCALPHA)
-    descriptionSurface.fill((255, 215, 0, 120))
+    descriptionSurface = pygame.Surface((960, (15 + 32)+(4*32)), pygame.SRCALPHA) # or 1920, y
+    descriptionSurface.fill((252, 106, 3, 160))
     
-    font = pygame.font.Font(None, 24)
+    font = pygame.font.Font(None, 32)
     name_text = font.render(f"Name: {char.name}", True, (255, 255, 255))
     for skill in char.base_skills + char.sig_skills:
       desc_text = font.render(f"Description: {skill.description}", True, (255, 255, 255))
-      descriptionSurface.blit(desc_text, (10, 130 + (30 * (char.base_skills + char.sig_skills).index(skill))))
+      descriptionSurface.blit(desc_text, (10, 50 + (32 * (char.base_skills + char.sig_skills).index(skill))))
     descriptionSurface.blit(name_text, (10, 10))
   elif(skill != None):
     # render skill description
-    descriptionSurface = pygame.Surface((1920, 300), pygame.SRCALPHA)
-    descriptionSurface.fill((255, 215, 0, 120))
+    descriptionSurface = pygame.Surface((1920, 150), pygame.SRCALPHA)
+    descriptionSurface.fill((252, 106, 3, 160))
     
-    font = pygame.font.Font(None, 24)
-    target_text = font.render(f"Targets: {skill.available_targets}", True, (255, 255, 255))
+    font = pygame.font.Font(None, 40)
+    target_text = font.render(f"Targets: {skill.available_targets[0]}, {skill.available_targets[1]}", True, (255, 255, 255))
     desc_text = font.render(f"Description: {skill.description}", True, (255, 255, 255))
+    name_text = font.render(f"Skill Name: {skill.name}", True, (255, 255, 255))
     
-
-    descriptionSurface.blit(target_text, (1000, 10))
-    descriptionSurface.blit(desc_text, (10, 10))
+    descriptionSurface.blit(name_text, (10, 10))
+    descriptionSurface.blit(target_text, (10, 55))
+    descriptionSurface.blit(desc_text, (10, 100))
   return descriptionSurface
 #endregion
 
