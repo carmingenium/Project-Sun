@@ -12,6 +12,9 @@ FPS = 60
 
 
 gamestate = "" # "partyselect", "novel" or "combat"
+current_encounter = 0
+current_novel = 0
+current_dialogue_line = 0
 
 # object lists
 characterslist = []
@@ -22,7 +25,6 @@ skillslist = []
 currentParty = []
 playerParty = []
 encounters = []
-encounterParty = []
 encounterParty1 = []
 encounterParty2 = []
 encounterParty3 = []
@@ -35,6 +37,7 @@ novelList = [ # 4 encounters, 5 dialogues => pre 1, post 1, post 2, post 3, post
 #endregion
 
 #region initialization
+
 def initializeGame():
   
   # loading all story files - reserved for later
@@ -62,9 +65,6 @@ def initializeGame():
   
   pygame.display.set_caption("Project Sun")
   
-  with open("story/test.txt", "r", encoding="utf-8") as f:
-    dialog_lines = [line.strip() for line in f.readlines()]
-  
   # initialize characters
   initializeCharacters()
 
@@ -84,14 +84,14 @@ def initializeCharacters():
   global playerParty, encounterParty1, encounterParty2, encounterParty3, encounterParty4, characterslist, skillslist, encounters
   #region PLAYER AVAILABLE CHARACTERS
   player = character.Character(
-    name="Blacked out Engineer",
+    name="Blacked Out Engineer",
     sprite='sprites/characters/player/engineer.png',
     speed=(3, 6),
     hp=100,
     base_skills=[character.Skill("Clink Clank", 10, 'sprites/skills/skill1.png', character.engineer_baseskill1, "Hits an enemy with a wrench, deals 10 damage.", ["enemy", "characters"]),
-                  character.Skill("GET WELDED", 8, 'sprites/skills/skill2.png', character.engineer_baseskill2,  "Welds a target for 8 damage. If target is mechanical, heals it instead.", ["all", "characters"])],
+                  character.Skill("Quick Weld", 8, 'sprites/skills/skill2.png', character.engineer_baseskill2,  "Welds a target for 8 damage. If target is mechanical, heals it instead.", ["all", "characters"])],
     sig_skills=[character.Skill("Ray Emitter", 6, 'sprites/skills/evade.png', character.engineer_sigskill1, "Burns an enemy with a ray emitter, deals 6 damage. If it hits, increases sanity by 10", ["enemy", "characters"]),
-                character.Skill("We need to build a wall", 10, 'sprites/skills/def.png', character.engineer_sigskill2, "Builds a wall with Rapid Construction Device, negating 10 damage from an enemy attack. ", ["enemy", "skills"])]
+                character.Skill("Instant Wall", 10, 'sprites/skills/def.png', character.engineer_sigskill2, "Builds a wall with Rapid Construction Device, negating 10 damage from an enemy attack. ", ["enemy", "skills"])]
   )
   characterSetup(player, playerParty)
   
@@ -141,7 +141,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Pie Throw", 3, 'sprites/skills/skill1.png', character.clown_baseskill1, "Throws a pie at the enemy, decreasing speed by 3.", ["all", "characters"]),
                  character.Skill("Vicious Mockery", 10, 'sprites/skills/skill2.png', character.clown_baseskill2, "Mocks the target, dealing 10 sanity damage.", ["all", "characters"])],
     sig_skills=[character.Skill("Laughing Gas", 5, 'sprites/skills/evade.png', character.clown_sigskill1, "Throws a gas bomb, causing various effects.", ["all", "characters"]),
-                character.Skill("Lie Down", 20, 'sprites/skills/def.png', character.clown_sigskill2, "Lies down to rest.", ["player", "skills"])] # does not need to be targetable, could add a 'click only' category !!! 
+                character.Skill("Lie Down", 20, 'sprites/skills/def.png', character.clown_sigskill2, "Lies down to rest.", ["click", "player"])]
     
   )
   characterSetup(clown, playerParty)
@@ -154,7 +154,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Banana Slip", 3, 'sprites/skills/skill1.png', character.mime_baseskill1, "Throws a banana peel to make the enemy slip, decreasing their speed by 3.", ["all", "characters"]),
                  character.Skill("Silent Mockery", 10, 'sprites/skills/skill2.png', character.mime_baseskill2, "Silently mocks the target, dealing 10 sanity damage.", ["all", "characters"])],
     sig_skills=[character.Skill("Silent Strike", 5, 'sprites/skills/evade.png', character.mime_sigskill1, "Silently strikes the enemy, dealing 10 damage.", ["enemy", "characters"]),
-                character.Skill("Invisible Wall", 10, 'sprites/skills/skill1.png', character.mime_sigskill2, "Creates an invisible wall to decrease 10 damage from incoming attack", ["enemy", "skill"])]
+                character.Skill("Invisible Wall", 10, 'sprites/skills/def.png', character.mime_sigskill2, "Creates an invisible wall to decrease 10 damage from incoming attack", ["enemy", "skill"])]
   )
   characterSetup(mime, playerParty) 
   
@@ -191,10 +191,10 @@ def initializeCharacters():
     sprite='sprites/characters/encounter/encounter1/carp_gray_west.png',
     speed=(2, 5),
     hp=80,
-    base_skills=[character.Skill("Splash Attack", 15, 'sprites/skills/skill1.png', character.carp_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Prepare", 15, 'sprites/skills/skill2.png', character.carp_baseskill2, "Baseskill2", ["enemy", "characters"])], # on-click category
-    sig_skills=[character.Skill("Fin Swipe", 15, 'sprites/skills/evade.png', character.carp_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Evasive Teleport", 15, 'sprites/skills/def.png', character.carp_sigskill2, "Sigskill2", ["player", "skills"])]
+    base_skills=[character.Skill("Splash Attack", 6, 'sprites/skills/skill1.png', character.carp_baseskill1, "Attacks target for 6 damage.", ["player", "characters"]),
+                 character.Skill("Prepare", 1, 'sprites/skills/skill2.png', character.carp_baseskill2, "Prepares for an attack, increasing speed by 1.", ["click", "characters"])],
+    sig_skills=[character.Skill("Fin Swipe", 8, 'sprites/skills/evade.png', character.carp_sigskill1, "Attacks target for 8 damage.", ["player", "characters"]),
+                character.Skill("Evasive Teleport", 8, 'sprites/skills/def.png', character.carp_sigskill2, "Decreases target skill's damage by 8.", ["player", "skills"])]
   )
   characterSetup(carp1, encounterParty1)
   carp2 = character.Character(
@@ -202,10 +202,10 @@ def initializeCharacters():
     sprite='sprites/characters/encounter/encounter1/carp_red_west.png',
     speed=(2, 5),
     hp=80,
-    base_skills=[character.Skill("Splash Attack", 15, 'sprites/skills/skill1.png', character.carp_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Prepare", 15, 'sprites/skills/skill2.png', character.carp_baseskill2, "Baseskill2", ["enemy", "characters"])], # on-click category
-    sig_skills=[character.Skill("Fin Swipe", 15, 'sprites/skills/evade.png', character.carp_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Evasive Teleport", 15, 'sprites/skills/def.png', character.carp_sigskill2, "Sigskill2", ["player", "skills"])]
+    base_skills=[character.Skill("Splash Attack", 6, 'sprites/skills/skill1.png', character.carp_baseskill1, "Attacks target for 6 damage.", ["player", "characters"]),
+                 character.Skill("Prepare", 1, 'sprites/skills/skill2.png', character.carp_baseskill2, "Prepares for an attack, increasing speed by 1.", ["click", "characters"])],
+    sig_skills=[character.Skill("Fin Swipe", 8, 'sprites/skills/evade.png', character.carp_sigskill1, "Attacks target for 8 damage.", ["player", "characters"]),
+                character.Skill("Evasive Teleport", 8, 'sprites/skills/def.png', character.carp_sigskill2, "Decreases target skill's damage by 8.", ["player", "skills"])]
   )
   characterSetup(carp2, encounterParty1)
   carp3 = character.Character(
@@ -213,11 +213,10 @@ def initializeCharacters():
     sprite='sprites/characters/encounter/encounter1/carp_purple_west.png',
     speed=(2, 5),
     hp=80,
-    base_skills=[character.Skill("Splash Attack", 15, 'sprites/skills/skill1.png', character.carp_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Prepare", 15, 'sprites/skills/skill2.png', character.carp_baseskill2, "Baseskill2", ["enemy", "characters"])], # on-click category
-    sig_skills=[character.Skill("Fin Swipe", 15, 'sprites/skills/evade.png', character.carp_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Evasive Teleport", 15, 'sprites/skills/def.png', character.carp_sigskill2, "Sigskill2", ["player", "skills"])]
-    
+    base_skills=[character.Skill("Splash Attack", 6, 'sprites/skills/skill1.png', character.carp_baseskill1, "Attacks target for 6 damage.", ["player", "characters"]),
+                 character.Skill("Prepare", 1, 'sprites/skills/skill2.png', character.carp_baseskill2, "Prepares for an attack, increasing speed by 1.", ["click", "characters"])],  
+    sig_skills=[character.Skill("Fin Swipe", 8, 'sprites/skills/evade.png', character.carp_sigskill1, "Attacks target for 8 damage.", ["player", "characters"]),
+                character.Skill("Evasive Teleport", 8, 'sprites/skills/def.png', character.carp_sigskill2, "Decreases target skill's damage by 8.", ["player", "skills"])]    
   )
   characterSetup(carp3, encounterParty1)
   carp4 = character.Character(
@@ -225,19 +224,18 @@ def initializeCharacters():
     sprite='sprites/characters/encounter/encounter1/carp_green_west.png',
     speed=(2, 5),
     hp=80,
-    base_skills=[character.Skill("Splash Attack", 15, 'sprites/skills/skill1.png', character.carp_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Prepare", 15, 'sprites/skills/skill2.png', character.carp_baseskill2, "Baseskill2", ["enemy", "characters"])], # on-click category
-    sig_skills=[character.Skill("Fin Swipe", 15, 'sprites/skills/evade.png', character.carp_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Evasive Teleport", 15, 'sprites/skills/def.png', character.carp_sigskill2, "Sigskill2", ["player", "skills"])]
-    
+    base_skills=[character.Skill("Splash Attack", 6, 'sprites/skills/skill1.png', character.carp_baseskill1, "Attacks target for 6 damage.", ["player", "characters"]),
+                 character.Skill("Prepare", 1, 'sprites/skills/skill2.png', character.carp_baseskill2, "Prepares for an attack, increasing speed by 1.", ["click", "characters"])],  
+    sig_skills=[character.Skill("Fin Swipe", 8, 'sprites/skills/evade.png', character.carp_sigskill1, "Attacks target for 8 damage.", ["player", "characters"]),
+                character.Skill("Evasive Teleport", 8, 'sprites/skills/def.png', character.carp_sigskill2, "Decreases target skill's damage by 8.", ["player", "skills"])]    
   )
   characterSetup(carp4, encounterParty1)
   encounter1 = renderer.Encounter(
     name="Encounter1",
     encounterPartyCharacters=encounterParty1,
-    encounterPartyPositions=[(1400, 400), (1600, 400), (1400, 600), (1600, 600)],
-    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
-    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    encounterPartyPositions=[(1360, 350), (1560, 350), (1360, 600), (1560, 600)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]],
+    playerPartyPositions=[(200, 350), (400, 350), (200, 600), (400, 600)],
     combatBGimage='sprites/backgrounds/encounter_1.png'
   )
   #endregion
@@ -249,32 +247,45 @@ def initializeCharacters():
     name="Changeling",
     sprite='sprites/characters/encounter/encounter2/changeling_base.png', # has 4 sprites, handled later with skills or during novel to combat process
     speed=(4, 7),
-    hp=110,
-    base_skills=[character.Skill("Shapeshift Strike", 15, 'sprites/skills/skill1.png', character.changeling_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Mimicry", 15, 'sprites/skills/skill2.png', character.changeling_baseskill2, "Baseskill2", ["enemy", "characters"])],
-    sig_skills=[character.Skill("Adaptive Defense", 15, 'sprites/skills/evade.png', character.changeling_sigskill1, "Sigskill1", ["enemy", "skills"]),
-                character.Skill("Regeneration", 15, 'sprites/skills/def.png', character.changeling_sigskill2, "Sigskill2", ["enemy", "characters"])]
-    
+    hp=200,
+    base_skills=[character.Skill("Slice", 20, 'sprites/skills/skill1.png', character.changeling_baseskill1, "Deals 20 damage.", ["player", "characters"]),
+                 character.Skill("Slash", 15, 'sprites/skills/skill2.png', character.changeling_baseskill2, "Deals 15 damage and 5 sanity damage.", ["player", "characters"])],
+    sig_skills=[character.Skill("Bone Impact", 12, 'sprites/skills/evade.png', character.changeling_sigskill1, "Deals 12 damage, slows target down by 1.", ["player", "skills"]),
+                character.Skill("Regeneration", 20, 'sprites/skills/def.png', character.changeling_sigskill2, "Heals by 20.", ["click", "characters"])] 
   )
   characterSetup(changeling, encounterParty2)
+  
+  
+  changeling_human = character.Character(
+    name="Cargo Technician",
+    sprite='sprites/characters/encounter/encounter2/changeling_human.png',
+    speed=(4, 7),
+    hp=200,
+    base_skills=[character.Skill("Slice", 20, 'sprites/skills/skill1.png', character.changeling_baseskill1, "Deals 20 damage.", ["player", "characters"]),
+                 character.Skill("Slash", 15, 'sprites/skills/skill2.png', character.changeling_baseskill2, "Deals 15 damage and 5 sanity damage.", ["player", "characters"])],
+    sig_skills=[character.Skill("Bone Impact", 12, 'sprites/skills/evade.png', character.changeling_sigskill1, "Deals 12 damage, slows target down by 1.", ["player", "skills"]),
+                character.Skill("Regeneration", 20, 'sprites/skills/def.png', character.changeling_sigskill2, "Heals by 20.", ["click", "characters"])] 
+  )
+  characterslist.append(changeling_human) # only for novel purposes
+  
   traitor = character.Character(
     name="Traitor",
     sprite='sprites/characters/encounter/encounter2/traitor.png', #sprite not ready
     speed=(3, 6),
-    hp=100,
-    base_skills=[character.Skill("Backstab", 15, 'sprites/skills/skill1.png', character.traitor_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Sabotage", 15, 'sprites/skills/skill2.png', character.traitor_baseskill2, "Baseskill2", ["enemy", "skills"])],
-    sig_skills=[character.Skill("Poisoned Blade", 15, 'sprites/skills/evade.png', character.traitor_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Vanish", 15, 'sprites/skills/def.png', character.traitor_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    hp=150,
+    base_skills=[character.Skill("Backstab", 20, 'sprites/skills/skill1.png', character.traitor_baseskill1, "Deals 20 damage.", ["player", "characters"]),
+                 character.Skill("Injector", 15, 'sprites/skills/skill2.png', character.traitor_baseskill2, "Injects unknown chemicals, decreasing sanity by 15.", ["player", "characters"])],
+    sig_skills=[character.Skill("Double Energy Sword Slash", 30, 'sprites/skills/evade.png', character.traitor_sigskill1, "Slashes an enemy, dealing 30 damage.", ["player", "characters"]),
+                character.Skill("Vanish", 15, 'sprites/skills/def.png', character.traitor_sigskill2, "Vanishes to heal by 15.", ["click", "characters"])]
     
   )
-  characterSetup(traitor, encounterParty2) # NEED TO REMOVE UNKNOWN FROM PLAYER PARTY
+  characterSetup(traitor, encounterParty2)
   encounter2 = renderer.Encounter(
     name="Encounter2",
     encounterPartyCharacters=encounterParty2,
-    encounterPartyPositions=[(1400, 400), (1600, 400)],
-    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
-    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    encounterPartyPositions=[(990, 450), (1305, 450)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]],
+    playerPartyPositions=[(242, 350), (455, 350), (242, 600), (455, 600)],
     combatBGimage='sprites/backgrounds/encounter_2.png'
   )
   #endregion
@@ -287,44 +298,44 @@ def initializeCharacters():
     sprite='sprites/characters/encounter/encounter3/heretic_battle.png',
     speed=(4, 7),
     hp=120,
-    base_skills=[character.Skill("Lunar Strike", 15, 'sprites/skills/skill1.png', character.heretic_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Gravity Well", 15, 'sprites/skills/skill2.png', character.heretic_baseskill2, "Baseskill2", ["enemy", "characters"])],
-    sig_skills=[character.Skill("Lunacy", 15, 'sprites/skills/evade.png', character.heretic_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Eclipse Shield", 15, 'sprites/skills/def.png', character.heretic_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Lunar Strike", 15, 'sprites/skills/skill1.png', character.heretic_baseskill1, "Deals 15 physical and sanity damage", ["player", "characters"]),
+                 character.Skill("Gravity Well", 20, 'sprites/skills/skill2.png', character.heretic_baseskill2, "Restores 20 sanity and health", ["enemy", "characters"])],
+    sig_skills=[character.Skill("Lunacy", 25, 'sprites/skills/evade.png', character.heretic_sigskill1, "Deals 25 physical and sanity damage", ["player", "characters"]),
+                character.Skill("Eclipse Shield", 15, 'sprites/skills/def.png', character.heretic_sigskill2, "Removes 15 damage from incoming attacks and heals 15 sanity.", ["player", "skills"])]
     
   )
   characterSetup(heretic, encounterParty3)
   encounter3 = renderer.Encounter(
     name="Encounter3",
     encounterPartyCharacters=encounterParty3,
-    encounterPartyPositions=[(1400, 800)],
-    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
-    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    encounterPartyPositions=[(1075, 565)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]],
+    playerPartyPositions=[(410, 410), (600, 410), (410, 660), (600, 660)],
     combatBGimage='sprites/backgrounds/encounter_3.png'
   )
   #endregion
   
   #region ENCOUNTER 4
-  # dragon
+  # dragon # SPRITE SIZE INCREASE
   encounterParty4 = []
   spacedragon = character.Character(
     name="Space Dragon",
     sprite='sprites/characters/encounter/encounter4/spacedragon.png',
     speed=(4, 8),
     hp=150,
-    base_skills=[character.Skill("Cosmic Breath", 20, 'sprites/skills/skill1.png', character.dragon_baseskill1, "Baseskill1", ["player", "characters"]),
-                 character.Skill("Tail Swipe", 15, 'sprites/skills/skill2.png', character.dragon_baseskill2, "Baseskill2", ["player", "characters"])],
-    sig_skills=[character.Skill("Starfall", 15, 'sprites/skills/evade.png', character.dragon_sigskill1, "Sigskill1", ["player", "characters"]),
-                character.Skill("Galactic Roar", 15, 'sprites/skills/def.png', character.dragon_sigskill2, "Sigskill2", ["enemy", "skills"])]
+    base_skills=[character.Skill("Cosmic Breath", 20, 'sprites/skills/skill1.png', character.dragon_baseskill1, "Deals 20  damage", ["player", "characters"]),
+                 character.Skill("Tail Swipe", 25, 'sprites/skills/skill2.png', character.dragon_baseskill2, "Deals 25 damage", ["player", "characters"])],
+    sig_skills=[character.Skill("Starfall", 30, 'sprites/skills/evade.png', character.dragon_sigskill1, "Deals 30 damage", ["player", "characters"]),
+                character.Skill("Galactic Roar", 35, 'sprites/skills/def.png', character.dragon_sigskill2, "Deals 35 damage", ["player", "characters"])]
     
   )
   characterSetup(spacedragon, encounterParty4)
   encounter4 = renderer.Encounter(
     name="Encounter4",
     encounterPartyCharacters=encounterParty4,
-    encounterPartyPositions=[(1400, 800)],
-    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]], # later defined by character selection screen
-    playerPartyPositions=[(200, 400), (400, 400), (200, 600), (400, 600)],
+    encounterPartyPositions=[(1000, 280)],
+    playerPartyCharacters=[playerParty[0], playerParty[1], playerParty[2], playerParty[3]],
+    playerPartyPositions=[(250, 300), (430, 300), (250, 550), (430, 550)],
     combatBGimage='sprites/backgrounds/encounter_4.png'
   )
   # nukies
@@ -337,27 +348,46 @@ def initializeCharacters():
   return
 #endregion
 
+def advanceEncounter(): # needs to run at combat end!
+  global current_encounter, playerParty
+  if(current_encounter == 1):
+    playerParty.remove(playerParty[1]) # remove unknown
+    renderer.barCharacterPositions.remove(renderer.barCharacterPositions[7])
+  current_encounter += 1
+  return
+def advanceDialogue():
+  global current_dialogue_line
+  if(current_dialogue_line < len(novelList[current_novel][0][1]) - 1):
+    current_dialogue_line += 1 
+  else:
+    advanceNovel()
+  return
+def advanceNovel():
+  global current_novel, current_dialogue_line
+  advanceEncounter()
+  renderer.AdvanceGameState("partyselect")
+  current_novel += 1
+  current_dialogue_line = 0
+  if(current_novel >= len(novelList)):
+    pygame.QUIT()
+  return
+
+def FindCharacterByName(name):
+  global characterslist
+  # first words until ':' are the name of the character speaking
+  name = name.split(":", 1)[0]
+
+  for char in characterslist:
+    if char.name == name:
+      return char
 
 
 
 def main():
   initializeGame()
   running = True
-  # renderer.renderNovelScene(characterslist[0], "This is a test dialogue line.") # have to send index for now as there are 2 lists in two different files.
-  # renderer.renderCombatScene(playerParty, encounterParty)
   renderer.initializePlayerCharacters(playerParty)
-  encounterDefaultPlayerParty = [playerParty[0], playerParty[1], playerParty[2], playerParty[3]]
-  
-  encounterDefault = renderer.Encounter(
-    name="Encounter1",
-    encounterPartyCharacters=encounterParty1,
-    encounterPartyPositions=[(1400, 400), (1600, 400), (1400, 800), (1600, 800)],
-    playerPartyCharacters=encounterDefaultPlayerParty, 
-    playerPartyPositions=[(200, 400), (400, 400), (200, 800), (400, 800)],
-    combatBGimage='sprites/backgrounds/encounter_1.png'
-  )
-  
-  
+
   while running:
     gamestate = renderer.game_state
     for event in pygame.event.get():
@@ -370,19 +400,20 @@ def main():
           if(selectedCharacters != None):
             currentParty = selectedCharacters
         if(gamestate == "combat"):
-          partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounterDefault)
-          renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounterParty)
-        # renderer.GetMousePos()
-        # renderer.ClickEvent("partyselect")
+          partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounters[current_encounter - 1])
+          renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounters[current_encounter - 1].encounterPartyCharacters)
+        if(gamestate == "novel"):
+          renderer.ClickEvent("novel", [], [], playerParty, [])
+          advanceDialogue()
         continue
     if gamestate == "combat":
-      encounterDefault.playerPartyCharacters = currentParty
-      renderer.RenderCombatScene(encounterDefault)
+      encounters[current_encounter - 1].playerPartyCharacters = currentParty
+      renderer.RenderCombatScene(encounters[current_encounter - 1])
     elif gamestate == "partyselect":
       renderer.RenderPartySelecter(playerParty)
     elif gamestate == "novel":
       # get story file and render accordingly
-      renderer.RenderNovelScene(playerParty[0], "this is a test.")
+      renderer.RenderNovelScene(FindCharacterByName(novelList[current_novel][0][1][current_dialogue_line]), novelList[current_novel][0][1][current_dialogue_line])
     clock.tick(FPS)  # Limit to 60 frames per second
   return
   

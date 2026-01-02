@@ -75,7 +75,7 @@ def unknown_baseskill2(self, target):
 
   # Determine if target is an enemy (not in player party)
   # For this context, treat 'enemy' as not one of the following names:
-  other_player_names = ["Blacked out Engineer", "Unknown", "Clown", "Mime", "Medic"]
+  other_player_names = ["Blacked Out Engineer", "Unknown", "Clown", "Mime", "Medic"]
   if target.name not in other_player_names:
     target.take_damage(self.damage)
     self.user.add_sanity(-10)
@@ -195,7 +195,7 @@ def borg_sigskill2(self, target): #not implemented
 #endregion
 #region Medic
 def medic_baseskill1(self, target):
-  other_player_names = ["Blacked out Engineer", "Unknown", "Clown", "Mime", "Head of Security", "Security Officer"]
+  other_player_names = ["Blacked Out Engineer", "Unknown", "Clown", "Mime", "Head of Security", "Security Officer"]
   if target.name in other_player_names:
     target.hp += self.damage
     if target.hp > target.max_hp:
@@ -221,16 +221,18 @@ def medic_sigskill2(self, target):
 #region Encounter1
 #region Carps
 def carp_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
   return
 def carp_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.currentSpeed += self.damage
   return
 def carp_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
   return
 def carp_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.currentdamage -= self.damage
+  if target.currentdamage < 0:
+    target.currentdamage = 0
   return
 #endregion
 #endregion
@@ -238,30 +240,38 @@ def carp_sigskill2(self, target):
 #region Encounter2
 #region Changeling #hopefully form changing.
 def changeling_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def changeling_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
+  target.add_sanity(-5)  
   return
 def changeling_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
+  target.currentSpeed -= 1
+  if target.currentSpeed < 1:
+    target.currentSpeed = 1  
   return
 def changeling_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp 
   return
 #endregion
 #region Traitor
 def traitor_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def traitor_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.add_sanity(-self.damage)  
   return
 def traitor_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def traitor_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp 
   return
 #endregion
 #endregion
@@ -269,16 +279,22 @@ def traitor_sigskill2(self, target):
 #region Encounter3
 #region Heretic
 def heretic_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
+  target.add_sanity(-self.damage)  
   return
 def heretic_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.hp += self.damage
+  if target.hp > target.max_hp:
+    target.hp = target.max_hp
+  target.add_sanity(self.damage)
   return
 def heretic_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)
+  target.add_sanity(-self.damage) 
   return
 def heretic_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.currentdamage -= self.damage
+  self.user.add_sanity(self.damage) 
   return
 #endregion
 #endregion
@@ -286,16 +302,16 @@ def heretic_sigskill2(self, target):
 #region Encounter4
 #region Dragon
 def dragon_baseskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def dragon_baseskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def dragon_sigskill1(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 def dragon_sigskill2(self, target):
-  target.take_damage(self.damage) #get dmg from skill object
+  target.take_damage(self.damage)  
   return
 #endregion
 #endregion
@@ -340,15 +356,11 @@ class Character:
   def add_sanity(self, amount):
     if(self.sanity + amount <= -50):
       self.sanity = 0
-      self.insanity()
     elif(self.sanity + amount >= 50):
       self.sanity = 50
-    self.sanity += amount
-    
+    else:
+      self.sanity += amount
     return self.sanity
-  def insanity(self):
-    # handle insanity effects here
-    return
 
 #region CHARACTER INITIALIZATION
 def initialize_characters(renderer):
