@@ -6,7 +6,7 @@ Mime: silently giggles*
 Cargo Technician: Hey, what is going on?
 Security Officer: Move, we need to get to the Engineering department.
 Cargo Technician: You didn't need to be so rude about it..
-Cargo Technician: I am coming from the department and I assure you, you do not wanna be there.
+Cargo Technician: I am coming from the department.. You should return.
 Medic: What happened there?
 Cargo Technician: Let's say it is not a very good sight...
 Medic: Don't worry, we can handle a bit of blood.

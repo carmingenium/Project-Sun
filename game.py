@@ -12,7 +12,7 @@ FPS = 60
 
 
 gamestate = "" # "partyselect", "novel" or "combat"
-current_encounter = 0
+current_encounter = -1
 current_novel = 0
 current_dialogue_line = 0
 
@@ -141,7 +141,7 @@ def initializeCharacters():
     base_skills=[character.Skill("Pie Throw", 3, 'sprites/skills/skill1.png', character.clown_baseskill1, "Throws a pie at the enemy, decreasing speed by 3.", ["all", "characters"]),
                  character.Skill("Vicious Mockery", 10, 'sprites/skills/skill2.png', character.clown_baseskill2, "Mocks the target, dealing 10 sanity damage.", ["all", "characters"])],
     sig_skills=[character.Skill("Laughing Gas", 5, 'sprites/skills/evade.png', character.clown_sigskill1, "Throws a gas bomb, causing various effects.", ["all", "characters"]),
-                character.Skill("Lie Down", 20, 'sprites/skills/def.png', character.clown_sigskill2, "Lies down to rest.", ["click", "player"])]
+                character.Skill("Lie Down", 20, 'sprites/skills/def.png', character.clown_sigskill2, "Lies down to rest.", ["click", "characters"])]
     
   )
   characterSetup(clown, playerParty)
@@ -350,10 +350,14 @@ def initializeCharacters():
 
 def advanceEncounter(): # needs to run at combat end!
   global current_encounter, playerParty
+  current_encounter += 1
+  if(current_encounter == 4):
+    current_encounter -= 1
   if(current_encounter == 1):
     playerParty.remove(playerParty[1]) # remove unknown
     renderer.barCharacterPositions.remove(renderer.barCharacterPositions[7])
-  current_encounter += 1
+    renderer.allPlayerCharacters.remove(renderer.allPlayerCharacters[1])
+  renderer.enemyPartyChars = encounters[current_encounter].encounterPartyCharacters
   return
 def advanceDialogue():
   global current_dialogue_line
@@ -363,9 +367,9 @@ def advanceDialogue():
     advanceNovel()
   return
 def advanceNovel():
-  global current_novel, current_dialogue_line
-  advanceEncounter()
+  global current_novel, current_dialogue_line, gamestate
   renderer.AdvanceGameState("partyselect")
+  gamestate = renderer.game_state
   current_novel += 1
   current_dialogue_line = 0
   if(current_novel >= len(novelList)):
@@ -380,8 +384,6 @@ def FindCharacterByName(name):
   for char in characterslist:
     if char.name == name:
       return char
-
-
 
 def main():
   initializeGame()
@@ -400,15 +402,18 @@ def main():
           if(selectedCharacters != None):
             currentParty = selectedCharacters
         if(gamestate == "combat"):
-          partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounters[current_encounter - 1])
-          renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounters[current_encounter - 1].encounterPartyCharacters)
+          partyPositions, skillPositions = renderer.CombatSpriteTransformCalculation(encounters[current_encounter])
+          renderer.ClickEvent("combat", partyPositions, skillPositions, playerParty, encounters[current_encounter].encounterPartyCharacters)
         if(gamestate == "novel"):
           renderer.ClickEvent("novel", [], [], playerParty, [])
+          if(current_dialogue_line == 0):
+            advanceEncounter()
           advanceDialogue()
         continue
+    gamestate = renderer.game_state
     if gamestate == "combat":
-      encounters[current_encounter - 1].playerPartyCharacters = currentParty
-      renderer.RenderCombatScene(encounters[current_encounter - 1])
+      encounters[current_encounter].playerPartyCharacters = currentParty
+      renderer.RenderCombatScene(encounters[current_encounter])
     elif gamestate == "partyselect":
       renderer.RenderPartySelecter(playerParty)
     elif gamestate == "novel":

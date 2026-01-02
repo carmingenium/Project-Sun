@@ -19,10 +19,9 @@ class Skill:
 
   def use(self, user, target):
     if(self != user.sig_skills[1]): # if not a defense skill
-      chance = user.sp + 50
+      chance = user.sanity + 50
       random_roll = random.randint(1, 100)
       if random_roll > chance:
-        print(f"{user.name}'s skill {self.name} missed!") # maybe dialog over character?
         return
     self.implementation(self, target) 
     # after skill is used, restore to base format.
@@ -85,9 +84,9 @@ def unknown_baseskill2(self, target):
     return
 def unknown_sigskill1(self, target):
   target.take_damage(self.currentdamage)
-  target.currentSpeed -= 1
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1
+  target.speed -= 1
+  if target.speed < 1:
+    target.speed = 1
   return
 def unknown_sigskill2(self, target):
   target.currentdamage -= self.currentdamage
@@ -102,9 +101,9 @@ def unknown_sigskill2(self, target):
 #region Head of Security
 def hos_baseskill1(self, target):
   target.take_damage(self.damage)
-  target.currentSpeed -= 1
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1
+  target.speed -= 1
+  if target.speed < 1:
+    target.speed = 1
   return
 def hos_baseskill2(self, target):
   target.take_damage(self.damage)
@@ -113,15 +112,15 @@ def hos_sigskill1(self, target):
   target.take_damage(self.damage)
   return
 def hos_sigskill2(self, target):
-  target.currentSpeed += self.damage 
+  target.speed += self.damage 
   return
 #endregion
 #region Security Officer
 def secoff_baseskill1(self, target):
   target.take_damage(self.damage) 
-  target.currentSpeed -= 1
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1
+  target.speed -= 1
+  if target.speed < 1:
+    target.speed = 1
 def secoff_baseskill2(self, target):
   target.take_damage(self.damage) 
   return
@@ -136,9 +135,9 @@ def secoff_sigskill2(self, target):
 #endregion
 #region Clown
 def clown_baseskill1(self, target):
-  target.currentSpeed -= self.damage
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1
+  target.speed -= self.damage
+  if target.speed < 1:
+    target.speed = 1
   return
 def clown_baseskill2(self, target):
   target.add_sanity(-self.damage)
@@ -158,9 +157,9 @@ def clown_sigskill2(self, target): # CLICK SKILL, lastly used maybe?
 #endregion
 #region Mime
 def mime_baseskill1(self, target):
-  target.currentSpeed -= self.damage
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1
+  target.speed -= self.damage
+  if target.speed < 1:
+    target.speed = 1
   return
 def mime_baseskill2(self, target):
   target.add_sanity(-self.damage)
@@ -181,7 +180,7 @@ def borg_baseskill1(self, target):
     target.hp = target.max_hp
   return
 def borg_baseskill2(self, target): # speed related
-  target.currentSpeed += 1
+  target.speed += 1
   target.hp += self.damage
   if target.hp > target.max_hp:
     target.hp = target.max_hp
@@ -209,7 +208,7 @@ def medic_baseskill2(self, target):
     target.hp = target.max_hp 
   return
 def medic_sigskill1(self, target):
-  target.currentSpeed += self.damage
+  target.speed += self.damage
   return
 def medic_sigskill2(self, target):
   target.take_damage(self.damage) 
@@ -224,7 +223,7 @@ def carp_baseskill1(self, target):
   target.take_damage(self.damage)
   return
 def carp_baseskill2(self, target):
-  target.currentSpeed += self.damage
+  target.speed += self.damage
   return
 def carp_sigskill1(self, target):
   target.take_damage(self.damage)
@@ -248,9 +247,9 @@ def changeling_baseskill2(self, target):
   return
 def changeling_sigskill1(self, target):
   target.take_damage(self.damage)
-  target.currentSpeed -= 1
-  if target.currentSpeed < 1:
-    target.currentSpeed = 1  
+  target.speed -= 1
+  if target.speed < 1:
+    target.speed = 1  
   return
 def changeling_sigskill2(self, target):
   target.hp += self.damage
@@ -335,9 +334,9 @@ class Character:
 
   def calculate_speed(self):
     # speed var is a range, get a random value within that range
-    currentSpeed = random.randint(self.speedRange[0], self.speedRange[1])
-    self.speed = currentSpeed
-    return currentSpeed
+    speed = random.randint(self.speedRange[0], self.speedRange[1])
+    self.speed = speed
+    return speed
 
   def take_damage(self, damage):
     self.hp -= damage
